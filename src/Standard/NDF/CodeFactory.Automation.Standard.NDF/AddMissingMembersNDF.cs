@@ -10,27 +10,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CodeFactory.Automation.Standard.Logic;
+using CodeFactory.Automation.Standard.NDF.Logic;
 
-namespace CodeFactory.Automation.Standard
+namespace CodeFactory.Automation.Standard.NDF
 {
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
     /// </summary>
-    public class AddMissingMembers : CSharpSourceCommandBase
+    public class AddMissingMembersNDF : CSharpSourceCommandBase
     {
-        private static readonly string commandTitle = "Add Missing Interface Members";
-        private static readonly string commandDescription = "Adds interface members that are missing from the implementation of the class.";
+        private static readonly string commandTitle = "Add Missing Interface Members NDF";
+        private static readonly string commandDescription = "Adds interface members that are missing from the implementation of the class using the NDF library.";
 
-        /// <summary>
-        /// Name of the Microsoft logging library.
-        /// </summary>
-        private const string MicrosoftLoggingNamespace = "Microsoft.Extensions.Logging";
+
 
 #pragma warning disable CS1998
 
         /// <inheritdoc />
-        public AddMissingMembers(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public AddMissingMembersNDF(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -40,7 +37,7 @@ namespace CodeFactory.Automation.Standard
         /// <summary>
         /// The fully qualified name of the command to be used with configuration.
         /// </summary>
-        public static string Type = typeof(AddMissingMembers).FullName;
+        public static string Type = typeof(AddMissingMembersNDF).FullName;
 
         /// <summary>
         /// Loads the external configuration definition for this command.
@@ -75,6 +72,22 @@ namespace CodeFactory.Automation.Standard
                 //If enabled if no interface members are missing then do not show.
                 if (isEnabled) isEnabled = sourceClass.GetMissingInterfaceMembers().Any();
 
+                if (isEnabled)
+                {
+                    var project = await result.GetHostingProjectAsync();
+
+                    isEnabled = project != null;
+
+                    if (isEnabled)
+                    {
+                        var references = await project.GetProjectReferencesAsync();
+
+                        isEnabled = references != null;
+
+                        if(isEnabled) isEnabled = (references.Any(r => r.Name.StartsWith(AddMissingMembers.MicrosoftLoggingNamespace)) & references.Any(r => r.Name == AddMissingMembers.NDFNamespace));
+                    }
+                }
+
             }
             catch (Exception unhandledError)
             {
@@ -94,19 +107,11 @@ namespace CodeFactory.Automation.Standard
         {
             try
             {
-                //Getting the hosting project
-                var project = await result.GetHostingProjectAsync() 
-                              ?? throw new CodeFactoryException($"Cannot load the project information for C# source code file '{result.Name}' cannot add members.");
-
-                var references = await project.GetProjectReferencesAsync();
-
-                var hasLogging = references.Any(r => r.Name.StartsWith(MicrosoftLoggingNamespace));
-
                 var sourceClass = result?.SourceCode?.Classes?.FirstOrDefault()
                                   ?? throw new CodeFactoryException(
                                       "The class could not be loaded cannot add members.");
 
-                var updatedClass = await  VisualStudioActions.AddMissingMembersStandardAsync(result.SourceCode, sourceClass, hasLogging);
+                var updatedClass = await  VisualStudioActions.AddMissingMembersStandardNDFAsync(result.SourceCode, sourceClass, true);
 
             }
             catch (Exception unhandledError)
