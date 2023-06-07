@@ -6,11 +6,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{DF91E081-52B7-4698-AB4A-9ABAE2DBEEBE}</ProjectGuid>
+    <ProjectGuid>{CF0F98B6-E6C9-4BBA-B61F-20E00260676F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CodeFactory.Automation.Standard.NDF</RootNamespace>
-    <AssemblyName>CodeFactory.Automation.Standard.NDF</AssemblyName>
+    <RootNamespace>CodeFactory.Automation.Standard.NDF.Logic</RootNamespace>
+    <AssemblyName>CodeFactory.Automation.Standard.NDF.Logic</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartAction>Program</StartAction>
