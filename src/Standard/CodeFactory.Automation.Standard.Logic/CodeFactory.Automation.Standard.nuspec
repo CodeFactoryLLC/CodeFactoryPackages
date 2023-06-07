@@ -6,9 +6,11 @@
 		<title>Standard automation logic to be used with CodeFactory Commands.</title>
 		<authors>CodeFactory, LLC.</authors>
 		<owners>CodeFactory, LLC.</owners>
-		<license type="expression">MIT</license>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 		<description>Standard automation logic to be used with CodeFactory commands built with Visual Studio - Windows.</description>
+		<projectUrl>https://github.com/CodeFactoryLLC/CodeFactoryPackages</projectUrl>
+		<license type="expression">MIT</license>
+		<repository type="git" url="https://github.com/CodeFactoryLLC/CodeFactoryPackages.git" branch="main" commit="019e2b9094f05bea10c1f4e99a79d4673e5c0da9" />
 		<releaseNotes>
 			Notes
 			Initial Release 
