@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd" >
 	<metadata>
 		<id>CodeFactory.Automation.Standard.NDF.Logic</id>
-		<version>2.23158.1-PreRelease</version>
+		<version>2.23159.1-PreRelease</version>
 		<title>Standard automation logic that supports the NDF library to be used with CodeFactory Commands.</title>
 		<authors>CodeFactory, LLC.</authors>
 		<owners>CodeFactory, LLC.</owners>
@@ -13,24 +13,8 @@
 		<repository type="git" url="https://github.com/CodeFactoryLLC/CodeFactoryPackages.git" branch="main" />
 		<releaseNotes>
 			Notes
-			Initial Release 
-
-			Automation Support:
-			- Add missing interface members with NDF logging and exception management.
-			- Register transient services with a class that supports dependency injection loader from NDF.
-
-			Bounds Check Blocks:
-			- BoundsCheckBlockNullNDF - Bounds checking for null condition, supports NDF managed exception types.
-			- BoundsCheckBlockStringNDF - Bounding checking for null or empty string, supports NDF managed exception types.
-
-			Catch Blocks:
-			- CatchBlockDBUpdateExceptionNDF - Catch block that catches BDUpdateException and supports NDF managed exceptions.
-			- CatchBlockExceptionNDF - Catch block for standard exception that supports NDF managed exceptions.
-			- CatchBlockManagedExceptionNDF - Catch block that catches ManagedException supports NDF managed exceptions.
-			- CatchBlockSqlExceptionNDF - Catch block that catches SqlException and supports NDF managed exceptions.
-
-			Logger Blocks:
-			- LoggerBlockNDF - Logger block that implements logging using NDF extension methods for logging.
+			Bug Fix
+			Security scope on BoundsCheckBlockNullNDF
 		</releaseNotes>
 		<copyright>Copyright © 2023 CodeFactory, LLC.</copyright>
 		<tags>Factory Automation</tags>
