@@ -12,7 +12,7 @@ namespace CodeFactory.Automation.Standard.NDF.Logic
     /// <summary>
     /// Null bounds check that support NDF logging and exceptions.
     /// </summary>
-    internal class BoundsCheckBlockNullNDF:BaseBoundsCheckBlock
+    public class BoundsCheckBlockNullNDF:BaseBoundsCheckBlock
     {
         /// <summary>Initializes the base class for the bounds check.</summary>
         /// <param name="ignoreWhenDefaultValueIsSet">Flag that determines if the bounds checking should be ignored if a default value is set.</param>

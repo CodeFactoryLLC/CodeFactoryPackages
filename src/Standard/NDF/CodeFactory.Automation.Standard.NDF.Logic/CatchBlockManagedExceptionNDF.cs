@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 
 namespace CodeFactory.Automation.Standard.NDF.Logic
 {
+    /// <summary>
+    /// CodeBlock that builds a catch block for ManagedException and passes the exception through to the next caller in the chain.
+    /// </summary>
     public class CatchBlockManagedExceptionNDF:BaseCatchBlock
     {
 
