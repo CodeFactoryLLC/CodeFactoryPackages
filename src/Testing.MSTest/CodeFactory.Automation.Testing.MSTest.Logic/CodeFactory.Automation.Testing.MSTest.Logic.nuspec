@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd" >
+	<metadata>
+		<id>CodeFactory.Automation.Testing.MStest.Logic</id>
+		<version>2.23163.1-PreRelease</version>
+		<title>Integration testing automation logic that uses MSTest.</title>
+		<authors>CodeFactory, LLC.</authors>
+		<owners>CodeFactory, LLC.</owners>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+		<description>MSTest integration test automation logic to be used with CodeFactory commands built with Visual Studio - Windows.</description>
+		<projectUrl>https://github.com/CodeFactoryLLC/CodeFactoryPackages</projectUrl>
+		<license type="expression">MIT</license>
+		<repository type="git" url="https://github.com/CodeFactoryLLC/CodeFactoryPackages.git" branch="main" />
+		<releaseNotes>
+			Initial release of automation logic.
+		</releaseNotes>
+		<copyright>Copyright © 2023 CodeFactory, LLC.</copyright>
+		<tags>Factory Automation</tags>
+		<dependencies>
+			<dependency id="CodeFactory.WinVs.SDK" version="2.23160.1-PreRelease"/>
+		</dependencies>
+		<icon>CFLogo128.png</icon>
+	</metadata>
+	<files>
+		<file src="Images\CFLogo128.png" target=""/>
+		<file src="bin\Debug\CodeFactory.Automation.Testing.MStest.Logic.dll" target="lib/net48/"/>
+		<file src="bin\Debug\CodeFactory.Automation.Testing.MStest.Logic.xml" target="lib/net48/"/>
+		<file src="bin\Debug\CodeFactory.Automation.Testing.MStest.Logic.pdb" target="lib/net48/"/>
+	</files>
+</package>	

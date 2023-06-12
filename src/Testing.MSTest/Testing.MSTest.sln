@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33627.172
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeFactory.Automation.Testing.MSTest.Logic", "CodeFactory.Automation.Testing.MSTest.Logic\CodeFactory.Automation.Testing.MSTest.Logic.csproj", "{ABC7B845-DB0E-460E-83AA-3B0D199D4063}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeFactory.Automation.Testing.MSTest", "CodeFactory.Automation.Testing.MSTest\CodeFactory.Automation.Testing.MSTest.csproj", "{CBD945AF-3211-4F28-ADE5-8FAC6745DA31}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ABC7B845-DB0E-460E-83AA-3B0D199D4063}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABC7B845-DB0E-460E-83AA-3B0D199D4063}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABC7B845-DB0E-460E-83AA-3B0D199D4063}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABC7B845-DB0E-460E-83AA-3B0D199D4063}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBD945AF-3211-4F28-ADE5-8FAC6745DA31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBD945AF-3211-4F28-ADE5-8FAC6745DA31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBD945AF-3211-4F28-ADE5-8FAC6745DA31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBD945AF-3211-4F28-ADE5-8FAC6745DA31}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AF91B52C-2E4F-485D-B0CE-36F09CC9B9E7}
+	EndGlobalSection
+EndGlobal
