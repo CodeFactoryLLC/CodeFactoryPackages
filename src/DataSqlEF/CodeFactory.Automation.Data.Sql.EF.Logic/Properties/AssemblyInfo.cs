@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CodeFactory.Automation.Standard.Logic")]
+[assembly: AssemblyTitle("CodeFactory.Automation.Data.Sql.EF.Logic")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CodeFactory.Automation.Standard.Logic")]
+[assembly: AssemblyProduct("CodeFactory.Automation.Data.Sql.EF.Logic")]
 [assembly: AssemblyCopyright("Copyright ©  2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("4a7d7959-1e8f-41cf-a606-ef326737cd78")]
+[assembly: Guid("f8f3f6d2-b7a6-4980-ac4b-9d4d8c5695bc")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -34,6 +34,6 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("2.23159.0.1")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: AssemblyCFEnvironment("CFVSW")]
-[assembly: AssemblyCFSdkVersion("2.23158.0.1")]
+[assembly: AssemblyCFSdkVersion("2.23160.0.1")]

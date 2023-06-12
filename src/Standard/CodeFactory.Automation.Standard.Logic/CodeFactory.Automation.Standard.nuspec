@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd" >
 	<metadata>
 		<id>CodeFactory.Automation.Standard.Logic</id>
-		<version>2.23158.1-PreRelease</version>
+		<version>2.23159.1-PreRelease</version>
 		<title>Standard automation logic to be used with CodeFactory Commands.</title>
 		<authors>CodeFactory, LLC.</authors>
 		<owners>CodeFactory, LLC.</owners>

@@ -6,11 +6,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{4A7D7959-1E8F-41CF-A606-EF326737CD78}</ProjectGuid>
+    <ProjectGuid>{0203C427-4CB7-4A2C-ACAA-1B8427DC6AD7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CodeFactory.Automation.Standard.Logic</RootNamespace>
-    <AssemblyName>CodeFactory.Automation.Standard.Logic</AssemblyName>
+    <RootNamespace>CodeFactory.Automation.Data.Sql.EF</RootNamespace>
+    <AssemblyName>CodeFactory.Automation.Data.Sql.EF</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartAction>Program</StartAction>
@@ -24,7 +24,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\CodeFactory.Automation.Standard.Logic.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,7 +34,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CodeFactory.WinVs.SDK" Version="2.23158.1-PreRelease" />
+    <PackageReference Include="CodeFactory.Automation.Standard.Logic">
+      <Version>2.23159.1-PreRelease</Version>
+    </PackageReference>
+    <PackageReference Include="CodeFactory.WinVs.SDK" Version="2.23160.1-PreRelease" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -49,17 +51,17 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddMissingMembers.cs" />
-    <Compile Include="BuilderPropertyTransformNullableTypes.cs" />
-    <Compile Include="POCOAutomation.cs" />
+    <Compile Include="CreateAutomationConfiguration.cs" />
+    <Compile Include="LoadConfigurations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RefreshEFRepository.cs" />
+    <Compile Include="ReloadAutomationConfiguration.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CodeFactory.Automation.Standard.nuspec" />
-  </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <None Include="Images\CFLogo128.png" />
+    <ProjectReference Include="..\CodeFactory.Automation.Data.Sql.EF.Logic\CodeFactory.Automation.Data.Sql.EF.Logic.csproj">
+      <Project>{f8f3f6d2-b7a6-4980-ac4b-9d4d8c5695bc}</Project>
+      <Name>CodeFactory.Automation.Data.Sql.EF.Logic</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
