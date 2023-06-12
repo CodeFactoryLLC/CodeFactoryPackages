@@ -1,4 +1,8 @@
-﻿using CodeFactory.WinVs.Logging;
+﻿//***************************************************************************
+//* Code Factory Packages
+//* Copyright (c) 2023 CodeFactory, LLC
+//***************************************************************************
+using CodeFactory.WinVs.Logging;
 using CodeFactory.WinVs.Models.CSharp;
 using CodeFactory.WinVs.Models.ProjectSystem;
 using CodeFactory.WinVs;

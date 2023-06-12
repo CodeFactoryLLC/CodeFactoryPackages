@@ -1,4 +1,9 @@
-﻿using CodeFactory.WinVs;
+﻿//***************************************************************************
+//* Code Factory Packages
+//* Copyright (c) 2023 CodeFactory, LLC
+//***************************************************************************
+
+using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.IDE;
 using CodeFactory.WinVs.Logging;
