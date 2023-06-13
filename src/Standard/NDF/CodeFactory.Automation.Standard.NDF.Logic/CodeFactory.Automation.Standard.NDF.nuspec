@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd" >
 	<metadata>
 		<id>CodeFactory.Automation.Standard.NDF.Logic</id>
-		<version>2.23159.1-PreRelease</version>
+		<version>2.23164.1-PreRelease</version>
 		<title>Standard automation logic that supports the NDF library to be used with CodeFactory Commands.</title>
 		<authors>CodeFactory, LLC.</authors>
 		<owners>CodeFactory, LLC.</owners>
@@ -13,13 +13,17 @@
 		<repository type="git" url="https://github.com/CodeFactoryLLC/CodeFactoryPackages.git" branch="main" />
 		<releaseNotes>
 			Notes
-			Bug Fix
-			Security scope on BoundsCheckBlockNullNDF
+			Library Extensions
+			- AddMissingMembersNDF
+			  - Added logLevel as an optional parameter when generating add members
+			  - Added tryBlock as an optional parameter when generating add members
+		    - CatchBlockManagedException
+			 - Added logLevel as an optional parameter to the the constructor.This will set the log level in the catch block.
 		</releaseNotes>
 		<copyright>Copyright © 2023 CodeFactory, LLC.</copyright>
 		<tags>Factory Automation</tags>
 		<dependencies>
-			<dependency id="CodeFactory.WinVs.SDK" version="2.23158.1-PreRelease"/>
+			<dependency id="CodeFactory.WinVs.SDK" version="2.23160.1-PreRelease"/>
 		</dependencies>
 		<icon>NDF128.png</icon>
 	</metadata>

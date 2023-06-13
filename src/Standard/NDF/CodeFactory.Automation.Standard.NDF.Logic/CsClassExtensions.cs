@@ -12,6 +12,9 @@ using CodeFactory.WinVs.Models.CSharp;
 
 namespace CodeFactory.Automation.Standard.NDF.Logic
 {
+    /// <summary>
+    /// Extension methods that suppor the <see cref="CsClass"/> model.
+    /// </summary>
     public static class CsClassExtensions
     {
         /// <summary>

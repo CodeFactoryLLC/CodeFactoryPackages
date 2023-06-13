@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CodeFactory.Automation.Standard.NDF.Logic
 {
- /// <summary>
+    /// <summary>
     /// Data class that holds constants used in AspNet Delivery.
     /// </summary>
     public static class AspNetConstants

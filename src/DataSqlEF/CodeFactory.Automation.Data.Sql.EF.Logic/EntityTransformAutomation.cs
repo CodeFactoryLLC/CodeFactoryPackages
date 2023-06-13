@@ -14,7 +14,7 @@ using CodeFactory.WinVs.Models.CSharp.Builder;
 
 namespace CodeFactory.Automation.Data.Sql.EF.Logic
 {
-   /// <summary>
+    /// <summary>
     /// Automation class that manages the transform of EF entities into POCO entities.
     /// </summary>
     public static class EntityTransformAutomation
