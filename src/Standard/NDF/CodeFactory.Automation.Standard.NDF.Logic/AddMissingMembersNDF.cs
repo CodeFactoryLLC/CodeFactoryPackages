@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using CodeFactory.WinVs;
 using CodeFactory.WinVs.Models.CSharp;
 using CodeFactory.WinVs.Models.CSharp.Builder;
+using Microsoft.Extensions.Logging;
 
 namespace CodeFactory.Automation.Standard.NDF.Logic
 {
@@ -37,9 +38,11 @@ namespace CodeFactory.Automation.Standard.NDF.Logic
         /// <param name="updateClass">Class model to add missing members to.</param>
         /// <param name="supportsLogging">Flag that determines if logging is enabled.</param>
         /// <param name="loggerFieldName">Optional, the name of the field to use for logging.</param>
-        /// <returns></returns>
+        /// <param name="logLevel">Optional, the target log level to use for logging messages. Default level is Information.</param>
+        /// <param name="tryBlock">Optional, the target try block to use for methods when adding missing methods. If not provided will provide standard NDF catch blocks.</param>
+        /// <returns>Updated class with missing methods.</returns>
         public static async Task<CsClass> AddMissingMembersStandardNDFAsync(this IVsActions source, CsSource sourceCode,
-            CsClass updateClass, bool supportsLogging, string loggerFieldName = "_logger")
+            CsClass updateClass, bool supportsLogging, string loggerFieldName = "_logger", LogLevel logLevel = LogLevel.Information, ITryBlock tryBlock = null)
         {
             //Bounds checks to make sure all data needed is provided.
             if (sourceCode == null)
@@ -79,13 +82,13 @@ namespace CodeFactory.Automation.Standard.NDF.Logic
                 new CatchBlockExceptionNDF(loggerBlock)
             };
 
-            ITryBlock tryBlock = new TryBlockStandard(loggerBlock, catchBlocks);
+            ITryBlock methodTryBlock = tryBlock == null ? new TryBlockStandard(loggerBlock, catchBlocks): tryBlock;
 
             if(supportsLogging) await manager.UsingStatementAddAsync(MicrosoftLoggingNamespace);
             await manager.UsingStatementAddAsync(NDFNamespace);
 
             //Creating the builders to generate code by member type.
-            IMethodBuilder methodBuilder = new MethodBuilderStandard(loggerBlock, boundsChecks, tryBlock);
+            IMethodBuilder methodBuilder = new MethodBuilderStandard(loggerBlock, boundsChecks, methodTryBlock);
             IPropertyBuilder propertyBuilder = new PropertyBuilderStandard();
             IEventBuilder eventBuilder = new EventBuilderStandard();
             
@@ -109,7 +112,7 @@ namespace CodeFactory.Automation.Standard.NDF.Logic
 
             foreach (var missingMethod in missingMethods)
             {
-                var methodSyntax = await methodBuilder.BuildMethodAsync(missingMethod, manager, 2);
+                var methodSyntax = await methodBuilder.BuildMethodAsync(missingMethod, manager, 2,defaultLogLevel:logLevel);
 
                 if(methodSyntax == null) continue;
 

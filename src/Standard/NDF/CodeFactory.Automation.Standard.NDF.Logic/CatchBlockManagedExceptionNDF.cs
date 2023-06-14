@@ -18,12 +18,17 @@ namespace CodeFactory.Automation.Standard.NDF.Logic
     /// </summary>
     public class CatchBlockManagedExceptionNDF:BaseCatchBlock
     {
+        /// <summary>
+        /// Log level used for catch block log messages.
+        /// </summary>
+        private readonly LogLevel _logLevel;
 
         /// <summary>
         /// Creates a instances of the <see cref="CatchBlockManagedExceptionNDF"/>
         /// </summary>
         /// <param name="loggerBlock">Optional, logger block to use for logging in the catch block.</param>
-        public CatchBlockManagedExceptionNDF(ILoggerBlock loggerBlock = null) : base(loggerBlock)
+        /// <param name="logLevel">Optional, sets the level for log messages default is Information.</param>
+        public CatchBlockManagedExceptionNDF(ILoggerBlock loggerBlock = null,LogLevel logLevel = LogLevel.Information) : base(loggerBlock)
         {
             //intentionally bank
         }
@@ -41,7 +46,7 @@ namespace CodeFactory.Automation.Standard.NDF.Logic
             formatter.AppendCodeLine(0,"{");
             if (LoggerBlock != null)
             {
-                formatter.AppendCodeLine(1, LoggerBlock.GenerateExitLogging(LogLevel.Information));
+                formatter.AppendCodeLine(1, LoggerBlock.GenerateExitLogging(_logLevel));
             }
             formatter.AppendCodeLine(1,"throw;");
             formatter.AppendCodeLine(0,"}");

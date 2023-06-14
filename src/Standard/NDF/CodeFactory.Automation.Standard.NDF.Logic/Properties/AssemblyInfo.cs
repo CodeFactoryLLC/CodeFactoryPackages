@@ -34,6 +34,6 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("2.23159.0.1")]
+[assembly: AssemblyFileVersion("2.23164.0.1")]
 [assembly: AssemblyCFEnvironment("CFVSW")]
-[assembly: AssemblyCFSdkVersion("2.23158.0.1")]
+[assembly: AssemblyCFSdkVersion("2.23160.0.1")]

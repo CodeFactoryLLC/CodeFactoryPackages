@@ -12,11 +12,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CodeFactory.Automation.Standard.NDF.Logic;
-
+using Microsoft.Extensions.Logging;
 
 namespace CodeFactory.Automation.Data.Sql.EF.Logic
 {
-   /// <summary>
+    /// <summary>
     /// Automation logic to create or update a data repository that supports a target entity hosted in Entity Framework.
     /// </summary>
     public static class RepositoryAutomation
@@ -32,6 +32,8 @@ namespace CodeFactory.Automation.Data.Sql.EF.Logic
         /// <param name="contractProject">Project the contract will be added to.</param>
         /// <param name="contractFolder">Optional, project folder contracts will be stored in, default is null.</param>
         /// <param name="additionalContractNamespaces">Optional, additional namespaces to add to the contract definition, default is null.</param>
+        /// <param name="loggerFieldName">Optional, the name of the logger field if logging is supported, default value is '_logger'</param>
+        /// <param name="logLevel">Optional, the target logging level for logging messages, default value is Information.</param>
         /// <param name="repoProject">Repository project.</param>
         /// <param name="contextClass">EF context class for accessing entity framework.</param>
         /// <param name="useNDF">Optional, flag that determines if the NDF libraries are used, default true.</param>
@@ -43,7 +45,7 @@ namespace CodeFactory.Automation.Data.Sql.EF.Logic
         public static async Task<CsClass> RefreshEFRepositoryAsync(this IVsActions source, CsClass efEntity, VsProject repoProject, 
             VsProject contractProject, CsClass poco, CsClass contextClass, bool useNDF = true,bool supportLogging = true, VsProjectFolder repoFolder = null, VsProjectFolder contractFolder = null,
             string namePrefix = null, string nameSuffix = null,List<ManualUsingStatementNamespace> additionRepositoryNamespaces = null,
-            List<ManualUsingStatementNamespace> additionalContractNamespaces = null)
+            List<ManualUsingStatementNamespace> additionalContractNamespaces = null,string loggerFieldName = "_logger", LogLevel logLevel = LogLevel.Information)
         {
 
             if (source == null)
@@ -188,13 +190,14 @@ namespace CodeFactory.Automation.Data.Sql.EF.Logic
         /// <param name="supportLogging">Optional, flag that determines if logging is supported, default true.</param>
         /// <param name="repoFolder">Optional, project folder the repositories are stored in, default is null.</param>
         /// <param name="additionRepositoryNamespaces">Optional, list of additional namespaces to update the repository with.</param>
+        /// <param name="loggerFieldName">Optional, name of the logger field if logging is supported, default is '_logger'</param>
         /// <param name="namePrefix">Optional, prefix to assign to the name of the repository, default is null.</param>
         /// <param name="nameSuffix">Optional, suffix to assign to the name of the repository, default is null.</param>
         /// <returns>Source for the created repository.</returns>
         /// <exception cref="CodeFactoryException">Raised if required data is missing to create the repository.</exception>
         private static async Task<CsSource> CreateEFRepositoryAsync(this IVsActions source, CsClass efEntity, VsProject repoProject,
             CsInterface repoContract, CsClass poco, CsClass contextClass, bool useNDF = true, bool supportLogging = true, VsProjectFolder repoFolder = null,
-            string namePrefix = null, string nameSuffix = null, List<ManualUsingStatementNamespace> additionRepositoryNamespaces = null)
+            string namePrefix = null, string nameSuffix = null, List<ManualUsingStatementNamespace> additionRepositoryNamespaces = null, string loggerFieldName = "_logger")
         {
             if (source == null)
                 throw new CodeFactoryException("CodeFactory automation was not provided, cannot create the repository.");
@@ -266,7 +269,7 @@ namespace CodeFactory.Automation.Data.Sql.EF.Logic
             repoFormatter.AppendCodeLine(2, "/// <summary>");
             repoFormatter.AppendCodeLine(2, "/// Logger used by the repository.");
             repoFormatter.AppendCodeLine(2, "/// </summary>");
-            repoFormatter.AppendCodeLine(2, "private readonly ILogger _logger;");
+            repoFormatter.AppendCodeLine(2, $"private readonly ILogger {loggerFieldName};");
             repoFormatter.AppendCodeLine(2);
             repoFormatter.AppendCodeLine(2, "/// <summary>");
             repoFormatter.AppendCodeLine(2, "/// Creates a new instance of the repository.");
@@ -275,7 +278,7 @@ namespace CodeFactory.Automation.Data.Sql.EF.Logic
             repoFormatter.AppendCodeLine(2, "/// <param name=\"connection\">The connection information for the repository.</param>");
             repoFormatter.AppendCodeLine(2, $"public {repoName}(ILogger<{repoName}> logger, dataModel.IDBContextConnection<dataModel.{contextClass.Name}> connection)");
             repoFormatter.AppendCodeLine(2, "{");
-            repoFormatter.AppendCodeLine(3, "_logger = logger;");
+            repoFormatter.AppendCodeLine(3, $"{loggerFieldName} = logger;");
             repoFormatter.AppendCodeLine(3, "_connectionString = connection.ConnectionString;");
             repoFormatter.AppendCodeLine(2, "}");
             repoFormatter.AppendCodeLine(2);
@@ -304,11 +307,13 @@ namespace CodeFactory.Automation.Data.Sql.EF.Logic
         /// <param name="supportLogging">Optional, flag that determines if logging is supported, default true.</param>
         /// <param name="repoFolder">Optional, project folder the repositories are stored in, default is null.</param>
         /// <param name="additionRepositoryNamespaces">Optional, list of additional namespaces to update the repository with.</param>
+        /// <param name="loggerFieldName">Optional, the name of the logger field if logging is supported, default value is '_logger'</param>
+        /// <param name="logLevel">Optional, the target logging level for logging messages, default value is Information.</param>
         /// <returns></returns>
         /// <exception cref="CodeFactoryException"></exception>
         private static async Task<CsClass> UpdateEFRepositoryAsync(this IVsActions source, CsClass efEntity, VsProject repoProject,
         CsSource repoSource,CsInterface repoContract, CsClass poco, CsClass contextClass, bool useNDF = true, bool supportLogging = true, VsProjectFolder repoFolder = null,
-        List<ManualUsingStatementNamespace> additionRepositoryNamespaces = null)
+        List<ManualUsingStatementNamespace> additionRepositoryNamespaces = null,string loggerFieldName = "_logger", LogLevel logLevel = LogLevel.Information)
         {
             if (source == null)
                 throw new CodeFactoryException("CodeFactory automation was not provided, cannot update the repository.");
@@ -355,8 +360,8 @@ namespace CodeFactory.Automation.Data.Sql.EF.Logic
 
             if (supportLogging)
             {
-                if (useNDF) logFormatter = new LoggerBlockNDF("_logger");
-                else logFormatter = new LoggerBlockMicrosoft("_logger");
+                if (useNDF) logFormatter = new LoggerBlockNDF(loggerFieldName);
+                else logFormatter = new LoggerBlockMicrosoft(loggerFieldName);
             }
 
             var boundCheckBlocks = new List<IBoundsCheckBlock>();
@@ -419,7 +424,7 @@ namespace CodeFactory.Automation.Data.Sql.EF.Logic
                 injectFormatter.AppendCodeLine(0, "}");
 
                 string syntax = injectFormatter.ReturnSource();
-                await methodBuilder.InjectMethodAsync(missingMethod, repoManager, 2, syntax: syntax);
+                await methodBuilder.InjectMethodAsync(missingMethod, repoManager, 2, syntax: syntax,defaultLogLevel:logLevel);
 
                 injectFormatter.ResetFormatter();
             }

@@ -284,14 +284,13 @@ namespace CodeFactory.Automation.Standard.Logic
 
                         if (targetPocoModel == null)
                         {
-                            var sourceModelClass = propertyToAdd.PropertyType.GetClassModel();
+                            var sourceModelClass = propertyToAdd.PropertyType.GetClassModel() ?? throw new CodeFactoryException(
+                                    $"Could not load the data model '{propertyToAdd.PropertyType.Name}' could not refresh the poco model, cannot update the POCO class '{pocoClass.Name}'.");
 
-                            if (sourceModelClass == null)
-                                throw new CodeFactoryException(
-                                    $"Could not the data model '{propertyToAdd.PropertyType.Name}' could not refresh the poco model, cannot update the POCO class '{pocoClass.Name}'.");
+                            if (sourceModelClass.IsLoaded == false) throw new CodeFactoryException($"Could not load the data model '{propertyToAdd.PropertyType.Name}' could not refresh the poco model, cannot update the POCO class '{pocoClass.Name}'.");
 
                             await source.RefreshPOCOAsync(sourceModelClass, pocoProject, defaultNamespaces, pocoFolder,
-                                pocoSummary, convertNullableTypes);
+                                $"POCO data class that supports '{sourceModelClass.Name}'", convertNullableTypes);
                         }
                     }
                 }
@@ -301,21 +300,24 @@ namespace CodeFactory.Automation.Standard.Logic
                     //Checking to make sure other source class objects used by the poco also have poco's created.
                     foreach (var propGenericType in propertyToAdd.PropertyType.GenericTypes)
                     {
-                        if (propGenericType.Name != sourceClass.Name)
+                        //Checking to make sure other source class objects used by the poco also have poco's created.
+                        if (propGenericType.TypeInTargetNamespace(sourceClass.Namespace))
                         {
-                            var targetPocoModel =
-                                await pocoProject.FindCSharpSourceByClassNameAsync(propGenericType.Name);
-
-                            if (targetPocoModel == null)
+                            if (propGenericType.Name != sourceClass.Name)
                             {
-                                var sourceModelClass = propGenericType.GetClassModel();
+                                var targetPocoModel =
+                                    await pocoProject.FindCSharpSourceByClassNameAsync(propGenericType.Name);
 
-                                if (sourceModelClass == null)
-                                    throw new CodeFactoryException(
-                                        $"Could not the data model '{propGenericType.Name}' could not refresh the poco model, cannot update the POCO class '{pocoClass.Name}'.");
+                                if (targetPocoModel == null)
+                                {
+                                    var sourceModelClass = propGenericType.GetClassModel() ?? throw new CodeFactoryException(
+                                            $"Could not load the data model '{propertyToAdd.PropertyType.Name}' could not refresh the poco model, cannot update the POCO class '{pocoClass.Name}'.");
 
-                                await source.RefreshPOCOAsync(sourceModelClass, pocoProject, defaultNamespaces,
-                                    pocoFolder, pocoSummary, convertNullableTypes);
+                                    if (sourceModelClass.IsLoaded == false) throw new CodeFactoryException($"Could not load the data model '{propertyToAdd.PropertyType.Name}' could not refresh the poco model, cannot update the POCO class '{pocoClass.Name}'.");
+
+                                    await source.RefreshPOCOAsync(sourceModelClass, pocoProject, defaultNamespaces, pocoFolder,
+                                        $"POCO data class that supports '{sourceModelClass.Name}'", convertNullableTypes);
+                                }
                             }
                         }
                     }

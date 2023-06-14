@@ -36,10 +36,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CodeFactory.Automation.Standard.Logic">
-      <Version>2.23159.1-PreRelease</Version>
+      <Version>2.23165.1-PreRelease</Version>
     </PackageReference>
     <PackageReference Include="CodeFactory.Automation.Standard.NDF.Logic">
-      <Version>2.23159.1-PreRelease</Version>
+      <Version>2.23164.1-PreRelease</Version>
     </PackageReference>
     <PackageReference Include="CodeFactory.WinVs.SDK" Version="2.23160.1-PreRelease" />
     <Reference Include="System" />
