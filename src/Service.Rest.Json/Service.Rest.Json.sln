@@ -5,6 +5,8 @@ VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeFactory.Automation.Service.Rest.Json", "CodeFactory.Automation.Service.Rest.Json\CodeFactory.Automation.Service.Rest.Json.csproj", "{C4341BB6-BE92-4BF2-A80E-FB8618519478}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeFactory.Automation.Service.Rest.Json.Logic", "CodeFactory.Automation.Service.Rest.Json.Logic\CodeFactory.Automation.Service.Rest.Json.Logic.csproj", "{3545A5CC-0F9A-4DBC-AA97-4A0AE191428F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{C4341BB6-BE92-4BF2-A80E-FB8618519478}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4341BB6-BE92-4BF2-A80E-FB8618519478}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4341BB6-BE92-4BF2-A80E-FB8618519478}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3545A5CC-0F9A-4DBC-AA97-4A0AE191428F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3545A5CC-0F9A-4DBC-AA97-4A0AE191428F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3545A5CC-0F9A-4DBC-AA97-4A0AE191428F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3545A5CC-0F9A-4DBC-AA97-4A0AE191428F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -6,11 +6,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{C4341BB6-BE92-4BF2-A80E-FB8618519478}</ProjectGuid>
+    <ProjectGuid>{3545A5CC-0F9A-4DBC-AA97-4A0AE191428F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CodeFactory.Automation.Service.Rest.Json</RootNamespace>
-    <AssemblyName>CodeFactory.Automation.Service.Rest.Json</AssemblyName>
+    <RootNamespace>CodeFactory.Automation.Service.Rest.Json.Logic</RootNamespace>
+    <AssemblyName>CodeFactory.Automation.Service.Rest.Json.Logic</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartAction>Program</StartAction>
@@ -24,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\CodeFactory.Automation.Service.Rest.Json.Logic.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CodeFactory.Automation.Standard.Logic">
+      <Version>2.23171.1-PreRelease</Version>
+    </PackageReference>
     <PackageReference Include="CodeFactory.WinVs.SDK" Version="2.23160.1-PreRelease" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -48,17 +52,17 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CreateAutomationConfiguration.cs" />
-    <Compile Include="LoadConfigurations.cs" />
+    <Compile Include="CSharpAbstractionAutomation.cs" />
+    <Compile Include="MethodExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RefreshRestService.cs" />
-    <Compile Include="ReloadAutomationConfiguration.cs" />
+    <Compile Include="RestJsonModelAutomation.cs" />
+    <Compile Include="RestJsonServiceAutomation.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CodeFactory.Automation.Service.Rest.Json.Logic\CodeFactory.Automation.Service.Rest.Json.Logic.csproj">
-      <Project>{3545a5cc-0f9a-4dbc-aa97-4a0ae191428f}</Project>
-      <Name>CodeFactory.Automation.Service.Rest.Json.Logic</Name>
-    </ProjectReference>
+    <None Include="CodeFactory.Automation.Service.Rest.nuspec" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\CFLogo128.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
