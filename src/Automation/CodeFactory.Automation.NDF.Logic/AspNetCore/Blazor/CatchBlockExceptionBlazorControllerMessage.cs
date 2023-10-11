@@ -29,12 +29,14 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Blazor
         /// </summary>
         /// <param name="loggerBlock">Optional, logger block to use for logging in the catch block.</param>
         /// <param name="logLevel">Optional, sets the level for log messages default is Error.</param>
-        /// <param name="showErrorMethodName">Default name of the method to call from the controller when raising the message from a NDF managed exception, default is 'ShowErrorMessage'</param>
+        /// <param name="showErrorMethodName">Default name of the method to call from the controller when raising the message from a NDF managed exception, default is 'RaiseShowErrorMessage'</param>
         public CatchBlockExceptionBlazorControllerMessage(ILoggerBlock loggerBlock = null,LogLevel logLevel = LogLevel.Error, string showErrorMethodName = null) : base(loggerBlock)
         {
+            _logLevel = logLevel;
+
             _showErrorMessageName = showErrorMethodName != null 
                 ? showErrorMethodName
-                : "ShowErrorMessage";
+                : "RaiseShowErrorMessage";
         }
 
         /// <summary>Builds the catch block</summary>

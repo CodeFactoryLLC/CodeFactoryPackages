@@ -35,7 +35,7 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Blazor
 
             _showErrorMessageName = showErrorMethodName != null 
                 ? showErrorMethodName
-                : "ShowErrorMessage";
+                : "RaiseShowErrorMessage";
         }
 
         /// <summary>Builds the catch block</summary>

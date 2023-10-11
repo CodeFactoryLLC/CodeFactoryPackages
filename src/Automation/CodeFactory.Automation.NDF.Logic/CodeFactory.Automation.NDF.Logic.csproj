@@ -48,6 +48,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AspNetCore\Blazor\BoundsCheckBlockNullBlazorControllerMessage.cs" />
+    <Compile Include="AspNetCore\Blazor\BoundsCheckBlockStringBlazorControllerMessage.cs" />
     <Compile Include="AspNetCore\Blazor\CatchBlockExceptionBlazorControllerMessage.cs" />
     <Compile Include="AspNetCore\Blazor\CatchBlockManagedExceptionBlazorControllerMessage.cs" />
     <Compile Include="AspNetCore\Service\Rest\Json\MethodExtensions.cs" />

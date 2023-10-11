@@ -37,32 +37,29 @@ namespace CodeFactory.Architecture.Blazor.Server
 
             try
             {
-                //var addMissingMember = new AddMissingMembersNDF(null, null);
-                //addMissingMember.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
+                var refreshEFRepository = new RefreshEFRepository(null, null);
+                refreshEFRepository.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
-                //var refreshEFRepository = new RefreshEFRepository(null, null);
-                //refreshEFRepository.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
+                var refreshRestService = new RefreshRestService(null, null);
+                refreshRestService.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
-                //var refreshRestService = new RefreshRestService(null, null);
-                //refreshRestService.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
+                var refreshTest = new RefreshTest(null, null);
+                refreshTest.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
-                //var refreshTest = new RefreshTest(null, null);
-                //refreshTest.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
+                var refreshFluentValidation = new RefreshFluentValidation(null, null);
+                refreshFluentValidation.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
-                //var refreshFluentValidation = new RefreshFluentValidation(null, null);
-                //refreshFluentValidation.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
+                var addMissingRepositoryMembers = new AddMissingRepositoryMembers(null, null);
+                addMissingRepositoryMembers.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
-                //var addMissingRepositoryMembers = new AddMissingRepositoryMembers(null, null);
-                //addMissingRepositoryMembers.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
+                var updateLogicImplementation = new UpdateLogicImplementation(null, null);
+                updateLogicImplementation.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
-                //var updateLogicImplementation = new UpdateLogicImplementation(null, null);
-                //updateLogicImplementation.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
+                var addMissingLogicMembers = new AddMissingLogicMembers(null, null);
+                addMissingLogicMembers.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
-                //var addMissingLogicMembers = new AddMissingLogicMembers(null, null); 
-                //addMissingLogicMembers.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
-
-                //var addMissingControllerMembers = new AddMissingControllerMembers(null, null);
-                //addMissingControllerMembers.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
+                var addMissingControllerMembers = new AddMissingControllerMembers(null, null);
+                addMissingControllerMembers.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
                 ConfigManager.LoadConfiguration(result, "Automation", VisualStudioActions);
             }

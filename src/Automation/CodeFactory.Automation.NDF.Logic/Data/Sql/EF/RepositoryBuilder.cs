@@ -15,7 +15,7 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
 /// <summary>
     /// Automation logic to create or update a data repository that supports a target entity hosted in Entity Framework.
     /// </summary>
-    public static class RepositoryAutomation
+    public static class RepositoryBuilder
     {
         /// <summary>
         /// Creates or updates a repository that uses entity framework for management of data.
@@ -426,6 +426,27 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             }
 
             return repoManager.Container;
+        }
+
+        /// <summary>
+        /// Checks the ef model property and determines if it should be included in a poco model implementation.
+        /// </summary>
+        /// <param name="source">Property to evaluate.</param>
+        /// <returns>True if the property should be included, false if not.</returns>
+        public static bool UseSourceProperty(CsProperty source)
+        {
+            if (source == null) return false;
+
+            bool useSource = (source.HasGet & source.HasSet & source.Security == CsSecurity.Public & !source.IsStatic);
+
+            if (source.HasAttributes & useSource)
+            {
+                useSource = !source.Attributes.Any(a => a.Type.Namespace == "System.ComponentModel.DataAnnotations.Schema" & a.Type.Name == "ForeignKeyAttribute");
+                if (useSource) useSource = !source.Attributes.Any(a => a.Type.Namespace == "System.ComponentModel.DataAnnotations.Schema" & a.Type.Name == "InversePropertyAttribute");
+            }
+
+            return useSource;
+
         }
     }
 }
