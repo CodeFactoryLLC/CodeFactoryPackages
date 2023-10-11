@@ -18,9 +18,8 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
     {
 
         public static async Task<CsClass> RefreshJsonRestService(this IVsActions source, CsInterface logicContract,
-            VsProject serviceProject, VsProjectFolder serviceFolder, VsProject modelProject, VsProject abstractionProject,
-            VsProject contractProject, VsProjectFolder modelFolder = null, VsProjectFolder abstractionFolder = null,
-            VsProjectFolder contractFolder = null)
+            VsProject serviceProject, VsProjectFolder serviceFolder, VsProject modelProject,
+            VsProjectFolder modelFolder = null)
         {
             if (source == null)
                 throw new CodeFactoryException("CodeFactory automation was not provided cannot refresh the service.");
@@ -37,14 +36,13 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
             if (modelProject == null)
                 throw new CodeFactoryException("Cannot load the model project, cannot refresh the service.");
 
-            if (abstractionProject == null)
-                throw new CodeFactoryException("Cannot load the abstraction project, cannot refresh the service.");
+            //if (abstractionProject == null)
+            //    throw new CodeFactoryException("Cannot load the abstraction project, cannot refresh the service.");
 
-            if (contractProject == null)
-                throw new CodeFactoryException("Cannot load the abstraction contract project, cannot refresh the service.");
+            //if (contractProject == null)
+            //    throw new CodeFactoryException("Cannot load the abstraction contract project, cannot refresh the service.");
 
-            var abstractContract =
-                await source.RefreshCSharpAbstractionContractAsync(logicContract, contractProject, contractFolder);
+            //var abstractContract = await source.RefreshCSharpAbstractionContractAsync(logicContract, contractProject, contractFolder);
 
             await source.AddSupportRestClassesAsync(modelProject);
             await source.AddJsonServiceExtensionsAsync(serviceProject);
@@ -57,7 +55,7 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
             var serviceClass = await source.UpdateJsonRestServiceAsync(logicContract, serviceSource, serviceProject, serviceFolder,
                 modelProject, modelFolder);
 
-            await source.RefreshAbstractionClass(serviceClass, abstractContract, serviceProject, abstractionProject, modelProject, abstractionFolder, modelFolder);
+            //await source.RefreshAbstractionClass(serviceClass, abstractContract, serviceProject, abstractionProject, modelProject, abstractionFolder, modelFolder);
 
 
             return serviceClass;
