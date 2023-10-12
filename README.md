@@ -11,7 +11,7 @@ All the CodeFactory automation that is hosted in this repository is designed to 
 Automation packages contain the core logic that makes up the pre built automation used with implementation of CodeFactory commands.
 
 |PackageName|Description|Ready to Use|Status|
-|--|--|--|--|--|--|
+|--|--|--|--|
 |CodeFactory.Automation.Standard.Logic|Standard automation libraries that are usable on any project.|Yes|Initial Release|
 |CodeFactory.Automation.NDF.Logic|Automation logic for a number of delivery scenarios that use the CodeFactory.NDF library in the implementation.|Yes|Initial Release|
 
