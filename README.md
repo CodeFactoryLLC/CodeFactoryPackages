@@ -8,17 +8,20 @@ All the CodeFactory automation that is hosted in this repository is designed to 
 - Training aid by providing live code that can be review and used to show how different parts of the SDK are used.
 
 ## Automation Packages
+Automation packages contain the core logic that makes up the pre built automation used with implementation of CodeFactory commands.
 
-|PackageName|Description|Overview|Ready to Use|Reusable Automation Libraries|Status|
+|PackageName|Description|Ready to Use|Status|
 |--|--|--|--|--|--|
-|CodeFactory.Automation.Standard|Standard commands that are usable on any project.|[Standard Overview](./src/Standard/Overview.md)|Yes|Yes|Planning|
-|CodeFactory.Automation.Standard.NDF|Standard commands that are usable on any project.|[Standard.NDF Overview](./src/Standard/NDF/Overview.md)|Yes|Yes|Planning|
-|CodeFactory.Automation.Data.Sql.EF|Respoitory Generation for SQL EF implmentation||No|Yes|Planning|
-|CodeFactory.Automation.Service.Rest|Service and abstraction generation for Web API services||No|Yes|Planning|
-|CodeFactory.Automation.Service.AzureFunction|Service and abstraction generation for Azure Function services||No|Yes|Planning|
-|CodeFactory.Automation.Service.AWSLambda|Servuce and abstraction generation for AWS Lambda||No|Yes|Planning|
-|CodeFactory.Automation.BlazorServer.Architecture|Full command implementation from blazore server, abstraction, service, logic, and repository implementations||Yes|Yes|Planning|
-|CodeFactory.Automation.MVC.Architecture|Full command implementation from MVC web application, abstraction, service, logic, and repository implementations||Yes|Yes|Planning|
+|CodeFactory.Automation.Standard.Logic|Standard automation libraries that are usable on any project.|Yes|Initial Release|
+|CodeFactory.Automation.NDF.Logic|Automation logic for a number of delivery scenarios that use the CodeFactory.NDF library in the implementation.|Yes|Initial Release|
 
 
+## Architecture Implementation
+
+Architecture implementation focuses on target implementations of CodeFactory automation. Each implementation is ready to use out of the box and consumes the already defined automation packages.
+
+|PackageName|Description|Ready to Use|Status|
+|--|--|--|--|
+|CodeFactory.Architecture.AspNetCore.Service.Rest|Full architecture automation to support automation from consuming a EF SQL implementation through the generation of WebAPI rest based API services.|Yes|Initial Release|
+|CodeFactory.Architecture.Blazor.Server|Full architecture automation to support automation from EF SQL implementation through services to complete blazor server component implementation with automation.|Yes|Initial Release|
 
