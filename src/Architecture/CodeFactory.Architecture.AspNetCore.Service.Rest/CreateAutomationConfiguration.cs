@@ -80,7 +80,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
 
             try
             {
-                await ConfigManager.CreateDefaultConfigurationAsync(result, "Blazor Server Architecture Configuration", "Automation");
+                await ConfigManager.CreateDefaultConfigurationAsync(result, "AspNetCore Rest Service Configuration", "Automation");
             }
             catch (Exception unhandledError)
             {
