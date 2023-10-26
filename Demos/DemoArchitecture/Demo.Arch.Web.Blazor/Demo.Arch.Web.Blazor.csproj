@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CodeFactory.NDF" Version="1.23111.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Demo.Arch.Abstraction.Contracts\Demo.Arch.Abstraction.Contracts.csproj" />
+    <ProjectReference Include="..\Demo.Arch.Abstraction.Transport.Rest\Demo.Arch.Abstraction.Transport.Rest.csproj" />
+    <ProjectReference Include="..\Demo.Arch.App.Model\Demo.Arch.App.Model.csproj" />
+    <ProjectReference Include="..\Demo.Arch.Web.Blazor.Model\Demo.Arch.Web.Blazor.Model.csproj" />
+  </ItemGroup>
+
+</Project>
