@@ -1,6 +1,12 @@
 # CodeFactory Packages
 Repository for ready to use packaged automation for CodeFactory, along with full source code.
 
+## Runtime Requirement
+All packages use the new **CodeFactory for Windows Runtime** 
+
+You can install this version directly from marketplace.
+- [CodeFactory for Windows](https://marketplace.visualstudio.com/items?itemName=CodeFactoryLLC.CodeFactoryForWindows)
+
 ## Overview
 All the CodeFactory automation that is hosted in this repository is designed to meet the following needs.
 - Ready to use right away no customization is required.
