@@ -205,10 +205,21 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
 
             var abstractionSource = (abstractionFolder != null
                 ? (await abstractionFolder.FindCSharpSourceByClassNameAsync(abstractionClassName))?.SourceCode
-                : (await abstractionProject.FindCSharpSourceByClassNameAsync(abstractionClassName))?.SourceCode)
-                ?? await source.CreateAbstractionClassAsync(clientName, abstractionContract, serviceProject, abstractionProject, abstractionFolder);
+                : (await abstractionProject.FindCSharpSourceByClassNameAsync(abstractionClassName))?.SourceCode);
 
-            return await source.UpdateAbstractionClassAsync(abstractionSource, serviceClass, abstractionContract, serviceProject, abstractionProject, modelProject, abstractionFolder, modelFolder);
+            var abstractionCreated = false;
+            if(abstractionSource == null)
+            { 
+                abstractionCreated = true;
+                abstractionSource = await source.CreateAbstractionClassAsync(clientName, abstractionContract, serviceProject, abstractionProject, abstractionFolder)
+                    ?? throw new CodeFactoryException($"Could not create the client abstraction '{clientName}', cannot refresh the abstraction client.");
+            }
+           
+            var clientClass = await source.UpdateAbstractionClassAsync(abstractionSource, serviceClass, abstractionContract, serviceProject, abstractionProject, modelProject, abstractionFolder, modelFolder);
+
+            if(abstractionCreated) await source.RegisterTransientClassesAsync(abstractionProject,false);
+
+            return clientClass;
         }
 
         /// <summary>

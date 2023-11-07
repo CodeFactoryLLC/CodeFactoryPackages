@@ -64,11 +64,11 @@ namespace CodeFactory.Automation.NDF.Logic
         /// <summary>
         /// Extension method that registers all transient classes with dependency injection.
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="targetProject"></param>
-        /// <returns></returns>
-        /// <exception cref="CodeFactoryException"></exception>
-        public static async Task RegisterTransientClassesAsync(this IVsActions source, VsProject targetProject)
+        /// <param name="source">CodeFactory Automation.</param>
+        /// <param name="targetProject">The target project to register transient services in.</param>
+        /// <param name="throwExceptionIfNoLibraryLoader">Optional, determines if a codefactory exception should be thrown if a library loader class is not found, default value is true.</param>
+        /// <exception cref="CodeFactoryException">Thrown if information is missing.</exception>
+        public static async Task RegisterTransientClassesAsync(this IVsActions source, VsProject targetProject,bool throwExceptionIfNoLibraryLoader = true)
         {
             if(targetProject == null) return;
             if (!targetProject.IsLoaded) return;
@@ -79,7 +79,12 @@ namespace CodeFactory.Automation.NDF.Logic
 
                 var loaderSourceClasses = await targetProject.GetProjectLoadersAsync();
 
-                if (!loaderSourceClasses.Any()) throw new CodeFactoryException($"There are no library loader classes found in project '{targetProject.Name}' cannot update dependency injection registration.");
+                if (!loaderSourceClasses.Any())
+                { 
+                    
+                    if(throwExceptionIfNoLibraryLoader) throw new CodeFactoryException($"There are no library loader classes found in project '{targetProject.Name}' cannot update dependency injection registration."); 
+                    return;
+                }
 
                 var transientClasses = (await targetProject.LoadInstanceProjectClassesForTransientRegistrationAsync()).ToList();
 

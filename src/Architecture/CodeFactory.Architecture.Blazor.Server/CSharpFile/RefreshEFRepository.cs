@@ -15,8 +15,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using CodeFactory.Automation.NDF.Logic.Testing.MSTest;
+using CodeFactory.Automation.NDF.Logic.General;
 
-namespace CodeFactory.Architecture.Blazor.Server
+namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 {
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
@@ -92,27 +94,60 @@ namespace CodeFactory.Architecture.Blazor.Server
         /// </summary>
         public static string IntegrationTestFolder = "IntegrationTestFolder";
 
+        /// <summary>
+        /// The name of the entity framework context class.
+        /// </summary>
         public static string EFContextClassName = "EFContextClassName";
 
         /// <summary>
-        /// Comma seperated list of the prefixes to remove from the EF class name when generating the target application entity model.
+        /// Optional, list of prefixes seperated by comma to remove from the name of the entity framework entity.
         /// </summary>
-        public static string RemoveNamePrefixesForEntityModel = "RemoveNamePrefixesForEntityModel";
+        public static string EFEntityRemovePrefixes = "EFEntityRemovePrefixes";
 
         /// <summary>
-        /// The repository and repository contract suffix to assign. 
+        /// Optional, list of prefixes seperated by comma to remove from the name of the entity framework entity.
         /// </summary>
-        public static string RepositoryAndContractSuffix = "RepositoryAndContractSuffix";
+        public static string EFEntityRemoveSuffixes = "EFEntityRemoveSuffixes";
+        
+        /// <summary>
+        /// Optional, prefix to assign to a repository when creating.
+        /// </summary>
+        public static string RepositoryPrefix = "RepositoryPrefix";
 
         /// <summary>
-        /// The prefix to assign to the name of a models validation class.
+        /// Optional, suffix to assign to a repository when creating.
         /// </summary>
-        public static string ModelValidatorPrefix = "ModelValidatorPrefix";
+        public static string RepositorySuffix = "RepositoryPrefix";
 
         /// <summary>
-        /// The suffix to assign to the name of a models validation class.
+        /// Optional, prefix to assign to a application model when creating.
         /// </summary>
-        public static string ModelValidatorSuffix = "ModelValidatorSuffix";
+        public static string AppModelPrefix ="AppModelPrefix"; 
+
+        /// <summary>
+        /// Optional, suffix to assign to a application model when creating.
+        /// </summary>
+        public static string AppModelSuffix ="AppModelSuffix"; 
+
+        /// <summary>
+        /// Optional, prefix to assign to a integration test when creating.
+        /// </summary>
+        public static string TestPrefix ="TestPrefix"; 
+
+        /// <summary>
+        /// Optional, suffix to assign to a integration test when creating.
+        /// </summary>
+        public static string TestSuffix ="TestSuffix"; 
+
+        /// <summary>
+        /// The prefix to assign to the name of a application models validation class.
+        /// </summary>
+        public static string AppModelValidatorPrefix = "AppModelValidatorPrefix";
+
+        /// <summary>
+        /// The suffix to assign to the name of a application models validation class.
+        /// </summary>
+        public static string AppModelValidatorSuffix = "AppModelValidatorSuffix";
 
         /// <summary>
         /// Loads the external configuration definition for this command.
@@ -150,35 +185,18 @@ namespace CodeFactory.Architecture.Blazor.Server
                     (
                         new ConfigParameter
                         { 
-                            Name = RemoveNamePrefixesForEntityModel,
-                            Guidance = "Comma seperated value list of the prefixes in case sensititve format to be removed from the application entity name."
+                            Name = EFEntityRemovePrefixes,
+                            Guidance = "Comma seperated value list of the prefixes in case sensitive format to be removed from the entity framework entity name when creating new objects."
                         }
                     )
                     .AddParameter
                     (
                         new ConfigParameter
-                        {
-                            Name= RepositoryAndContractSuffix,
-                            Guidance = "Suffix to be assigned to the name of the repository and the contract for the repository."
+                        { 
+                            Name = EFEntityRemoveSuffixes,
+                            Guidance = "Comma seperated value list of the suffixes in case sensitive format to be removed from the entity framework entity name when creating new objects."
                         }
                     )
-                    .AddParameter
-                    (
-                        new ConfigParameter
-                        {
-                            Name= ModelValidatorPrefix,
-                            Guidance = "The prefix to assign to the name of a models validation class."
-                        }
-                    )
-                    .AddParameter
-                    (
-                        new ConfigParameter
-                        {
-                            Name= ModelValidatorSuffix,
-                            Guidance = "The suffix to assign to the name of a models validation class."
-                        }
-                    )
-
                 )
                 .AddProject
                 (
@@ -198,6 +216,23 @@ namespace CodeFactory.Architecture.Blazor.Server
                                 "Optional, set the relative path from the root of the project. If it is more then one directory deep then use '/' instead of back slashes."
                         }
                     )
+                    .AddParameter
+                    (
+                        new ConfigParameter
+                        { 
+                            Name = AppModelPrefix,
+                            Guidance = "Optional, prefix to assign to the application model entity when it is created."
+                        }
+                    )
+                    .AddParameter
+                    (
+                        new ConfigParameter
+                        { 
+                            Name = AppModelSuffix,
+                            Guidance = "Optional, suffix to assign to the application model entity when it is created.",
+                            Value = "AppModel"
+                        }
+                    )
                 )
                 .AddProject
                 (
@@ -215,6 +250,23 @@ namespace CodeFactory.Architecture.Blazor.Server
                             Required = false,
                             Guidance =
                                 "Optional, set the relative path from the root of the project. If it is more then one directory deep then use '/' instead of back slashes."
+                        }
+                    )
+                    .AddParameter
+                    (
+                        new ConfigParameter
+                        { 
+                            Name = RepositoryPrefix,
+                            Guidance = "Optional, prefix to assign to the repository when it is created."
+                        }
+                    )
+                    .AddParameter
+                    (
+                        new ConfigParameter
+                        { 
+                            Name = RepositorySuffix,
+                            Guidance = "Optional, suffix to assign to the repository when it is created.",
+                            Value = "Repository"
                         }
                     )
                 )
@@ -253,6 +305,23 @@ namespace CodeFactory.Architecture.Blazor.Server
                             Required = false,
                             Guidance =
                                 "Optional, set the relative path from the root of the project. If it is more then one directory deep then use '/' instead of back slashes."
+                        }
+                    )
+                    .AddParameter
+                    (
+                        new ConfigParameter
+                        { 
+                            Name = TestPrefix,
+                            Guidance = "Optional, prefix to assign to the integration test when it is created."
+                        }
+                    )
+                    .AddParameter
+                    (
+                        new ConfigParameter
+                        { 
+                            Name = TestSuffix,
+                            Guidance = "Optional, suffix to assign to the integration test when it is created.",
+                            Value = "Test"
                         }
                     )
                 );
@@ -307,17 +376,30 @@ namespace CodeFactory.Architecture.Blazor.Server
                 VsProjectFolder efModelFolder =
                     await VisualStudioActions.GetProjectFolderFromConfigAsync(command.ExecutionProject, ExecutionModelFolder);
 
+                var contextClassName = command.ExecutionProject.ParameterValue(EFContextClassName);
+                var efEntityRemovePrefixs = command.ExecutionProject.ParameterValue(EFEntityRemovePrefixes);
+                var efEntityRemoveSuffixes = command.ExecutionProject.ParameterValue(EFEntityRemoveSuffixes);
+
                 VsProject appModelProject = await VisualStudioActions.GetProjectFromConfigAsync(command.Project(EntityProject))
                     ?? throw new CodeFactoryException("Could not load the entity model project, cannot refresh the EF repository.");
 
                 VsProjectFolder appModelFolder =
                     await VisualStudioActions.GetProjectFolderFromConfigAsync(command.Project(EntityProject), EntityFolder);
 
+                var appModelPrefix = command.Project(EntityProject).ParameterValue(AppModelPrefix);
+                var appModelSuffix = command.Project(EntityProject).ParameterValue(AppModelSuffix);
+                var appModelValidatorPrefix = command.Project(EntityProject).ParameterValue(AppModelValidatorPrefix);
+                var appModelValidatorSuffix = command.Project(EntityProject).ParameterValue(AppModelValidatorSuffix);
+
                 VsProject repoProject = await VisualStudioActions.GetProjectFromConfigAsync(command.Project(RepoProject))
                     ?? throw new CodeFactoryException("Could not load the repository project, cannot refresh the EF repository.");
 
                 VsProjectFolder repoFolder =
                     await VisualStudioActions.GetProjectFolderFromConfigAsync(command.Project(RepoProject), RepoFolder);
+
+                var repoPrefix = command.Project(RepoProject).ParameterValue(RepositoryPrefix);
+
+                var repoSuffix = command.Project(RepoProject).ParameterValue(RepositorySuffix);
 
                 VsProject contractProject =
                     await VisualStudioActions.GetProjectFromConfigAsync(command.Project(RepoContractProject)) ??
@@ -334,31 +416,9 @@ namespace CodeFactory.Architecture.Blazor.Server
                     await VisualStudioActions.GetProjectFolderFromConfigAsync(command.Project(IntegrationTestProject),
                         IntegrationTestFolder);
 
-                var contextClassName = command.ExecutionProject.ParameterValue(EFContextClassName);
+                var testPrefix = testProject != null ? command.Project(IntegrationTestProject).ParameterValue(TestPrefix) : null;
 
-                var appModelPrefixReplacements = command.ExecutionProject.ParameterValue(RemoveNamePrefixesForEntityModel);
-
-                var modelValidatorPrefix = command.ExecutionProject.ParameterValue(ModelValidatorPrefix);
-                var modelValidatorSuffix = command.ExecutionProject.ParameterValue(ModelValidatorSuffix);
-
-                NameManagement nameManagement = null;
-
-                if(!string.IsNullOrEmpty(appModelPrefixReplacements))
-                { 
-                    var prefixes = appModelPrefixReplacements.Split(',');
-                    
-                    var renamePrefixes = new List<string>();
-                    foreach (var prefix in prefixes)
-                    {
-                        var formattedPrefix = prefix.Trim();
-
-                        if(!string.IsNullOrEmpty(formattedPrefix)) renamePrefixes.Add(formattedPrefix);
-                    }
-
-                    if(renamePrefixes.Any()) nameManagement = NameManagement.Init(renamePrefixes,null,null,null);
-                }
-
-                string repositorySuffix = command.ExecutionProject.ParameterValue(RepositoryAndContractSuffix);
+                var testSuffix = testProject != null ? command.Project(IntegrationTestProject).ParameterValue(TestSuffix) : null;
 
                 if (string.IsNullOrWhiteSpace(contextClassName))
                     throw new CodeFactoryException(
@@ -377,29 +437,44 @@ namespace CodeFactory.Architecture.Blazor.Server
                 var efModel = result.SourceCode?.Classes?.FirstOrDefault()
                     ?? throw new CodeFactoryException("The EF entity class could not be loaded, cannot refresh the EF repository.");
 
-                var appModel = (await VisualStudioActions.RefreshPOCOAsync(efModel, appModelProject,
+                var nameManagement = NameManagement.Init(efEntityRemovePrefixs,efEntityRemoveSuffixes,appModelPrefix,appModelSuffix);
+
+                var appModel = (await VisualStudioActions.RefreshModelAsync(efModel, appModelProject,
                                    EntityModelNamespaces(),nameManagement, appModelFolder, $"Application data model that supports '{efModel.Name}'", true,useSourceProperty: RepositoryBuilder.UseSourceProperty))
                                ?? throw new CodeFactoryException($"Could not load the entity that supports the ef model '{efModel.Name}', cannot refresh the EF repository.");
 
-                NameManagement modelValidatorNameManagement = null;
+                string noReplacePrefix = null;
+                string noReplaceSuffix = null;
 
-                string removePrefixes = null;
-
-                string removeSuffixes = null;
-                if(!string.IsNullOrEmpty(modelValidatorSuffix) | !string.IsNullOrEmpty(modelValidatorPrefix)) modelValidatorNameManagement = NameManagement.Init(removePrefixes,removeSuffixes,modelValidatorPrefix, modelValidatorSuffix);
-                    
-
-                var validation = (await VisualStudioActions.RefreshValidationAsync(appModel,appModelProject,appModelFolder,modelValidatorNameManagement))
+                var modelValidatorNameManagement = NameManagement.Init(noReplacePrefix,noReplaceSuffix,appModelValidatorPrefix,appModelValidatorSuffix);
+                
+                var validation = (await VisualStudioActions.RefreshValidationClassAsync(appModel,appModelProject,appModelFolder,modelValidatorNameManagement))
                                 ?? throw new CodeFactoryException($"Could not refresh the validation for the app model '{appModel.Name}', cannot refresh the EF repository.");
 
                 await VisualStudioActions.RefreshFluentValidationAsync(efModel,appModel,validation);
 
-
                 await VisualStudioActions.RefreshEntityFrameworkEntityTransform(appModel, efModel, efModelProject,
                     efModelFolder);
 
-                var repoClass = await VisualStudioActions.RefreshEFRepositoryAsync(efModel, repoProject, contractProject, appModel,
-                    contextClass, supportsNDF, supportsLogging, repoFolder, contractFolder,nameSuffix:repositorySuffix);
+                var repositoryName = NameManagement.Init(efEntityRemovePrefixs,efEntityRemoveSuffixes,repoPrefix,repoSuffix).FormatName(efModel.Name);
+
+                var repoClass = await VisualStudioActions.RefreshEFRepositoryAsync(repositoryName,efModel, repoProject, contractProject, appModel,
+                    contextClass, supportsNDF, supportsLogging, repoFolder, contractFolder);
+
+               
+                if(repoClass != null & testProject != null)
+                { 
+                    var contractName = $"I{repositoryName}";
+
+                    CsInterface contractInterface = contractFolder != null ? (await contractFolder.FindCSharpSourceByInterfaceNameAsync(contractName))?.SourceCode?.Interfaces?.FirstOrDefault() 
+                    : (await contractProject.FindCSharpSourceByInterfaceNameAsync(contractName))?.SourceCode?.Interfaces?.FirstOrDefault();
+                    
+                    if(contractInterface != null)
+                        { 
+                            var testName = NameManagement.Init(noReplacePrefix,noReplaceSuffix,testPrefix,testSuffix).FormatName(repositoryName);
+                            await VisualStudioActions.RefreshMSTestIntegrationTestAsync(testName, contractInterface,testProject); 
+                        }
+                }
 
             }
             catch (CodeFactoryException codeFactoryError)

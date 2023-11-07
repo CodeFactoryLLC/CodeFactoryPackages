@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using CodeFactory.Automation.Standard.Logic;
 namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
 {
-/// <summary>
+    /// <summary>
     /// Automation logic that supports integration testing using the MSTest unit test framework.
     /// </summary>
     public static class IntegrationTestBuilder
@@ -19,12 +19,15 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
         /// Automation to refresh the integration test implementation.
         /// </summary>
         /// <param name="source">CodeFactory automation access to Visual Studio.</param>
+        /// <param name="testName">The name of the test class to be refreshed.</param>
         /// <param name="contract">The target contract to implement testing for.</param>
         /// <param name="testProject">The target project the  target logic is implemented in.</param>
         /// <returns></returns>
-        public static async Task RefreshMSTestIntegrationTestAsync(this IVsActions source, CsInterface contract, VsProject testProject)
+        public static async Task RefreshMSTestIntegrationTestAsync(this IVsActions source,string testName, CsInterface contract, VsProject testProject)
         {
             if (source == null) throw new CodeFactoryException("Could not access the CodeFactory automation for visual studio cannot refresh the integration test.");
+
+            if(string.IsNullOrEmpty(testName)) throw new CodeFactoryException("No test name was provided cannot update the integration test.");
 
             if (contract == null) throw new CodeFactoryException("No contract was provided cannot update the integration test.");
 
@@ -34,7 +37,7 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
 
             await testProject.CreateTestLoaderAsync();
 
-            var testClassName = contract.FormatTestClassName();
+            var testClassName = testName;
 
             if (string.IsNullOrEmpty(testClassName)) throw new CodeFactoryException("Could not load the test class name. Cannot refresh the integration tests.");
 
@@ -250,18 +253,6 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
             }
 
             return;
-        }
-
-        /// <summary>
-        /// Formats the repositories test class name.
-        /// </summary>
-        /// <param name="source">Source interface to convert to the test class name.</param>
-        /// <returns>Formatted test class name or null if it was not found.</returns>
-        private static string FormatTestClassName(this CsInterface source)
-        {
-            if (source == null) return null;
-
-            return $"{source.Name.GenerateCSharpFormattedClassName()}Test";
         }
 
         /// <summary>

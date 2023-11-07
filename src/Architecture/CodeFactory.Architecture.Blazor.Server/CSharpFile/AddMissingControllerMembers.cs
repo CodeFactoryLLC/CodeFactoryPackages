@@ -16,7 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace CodeFactory.Architecture.Blazor.Server
+namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 {
    /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.

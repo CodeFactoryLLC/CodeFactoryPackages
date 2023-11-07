@@ -10,20 +10,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
-namespace CodeFactory.Architecture.Blazor.Server
+namespace CodeFactory.Architecture.Blazor.Server.Solution
 {
-    /// <summary>
+/// <summary>
     /// Code factory command for automation of the solution when selected from solution explorer.
     /// </summary>
-    public class CreateAutomationConfiguration : SolutionCommandBase
+    public class ReloadAutomationConfiguration : SolutionCommandBase
     {
-        private static readonly string commandTitle = "Create Automation Configuration";
-        private static readonly string commandDescription = "Creates an empty automation configuration.";
+        private static readonly string commandTitle = "Reload Automation Configuration";
+        private static readonly string commandDescription = "Reloads the automation configuration.";
 
 #pragma warning disable CS1998
         /// <inheritdoc />
-        public CreateAutomationConfiguration(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public ReloadAutomationConfiguration(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -33,7 +34,7 @@ namespace CodeFactory.Architecture.Blazor.Server
         /// <summary>
         /// The fully qualified name of the command to be used with configuration.
         /// </summary>
-        public static string Type = typeof(CreateAutomationConfiguration).FullName;
+        public static string Type = typeof(ReloadAutomationConfiguration).FullName;
 
         /// <summary>
         /// Loads the external configuration definition for this command.
@@ -59,7 +60,7 @@ namespace CodeFactory.Architecture.Blazor.Server
 
             try
             {
-                isEnabled = !(await ConfigManager.HasAutomationConfigAsync(result, "Automation"));
+                isEnabled = await ConfigManager.HasAutomationConfigAsync(result, "Automation");
             }
             catch (Exception unhandledError)
             {
@@ -80,7 +81,11 @@ namespace CodeFactory.Architecture.Blazor.Server
 
             try
             {
-                await ConfigManager.CreateDefaultConfigurationAsync(result, "Blazor Server Architecture Configuration", "Automation");
+                ConfigManager.LoadConfiguration(result, "Automation", VisualStudioActions);
+            }
+            catch (CodeFactoryException codeFactoryError)
+            {
+                MessageBox.Show(codeFactoryError.Message, "Automation Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception unhandledError)
             {
