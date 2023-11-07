@@ -168,9 +168,12 @@ namespace CodeFactory.Architecture.Blazor.Server
 
                 var validatorSuffix = command.ExecutionProject.ParameterValue(ModelValidatorSuffix);
 
+                string removePrefixes = null;
+                string removeSuffixes = null;
+
                 NameManagement nameManagement = null;
 
-                if(!string.IsNullOrEmpty(validatorPrefix) | !string.IsNullOrEmpty(validatorSuffix)) nameManagement = NameManagement.Init(null,null, validatorPrefix, validatorSuffix);
+                if(!string.IsNullOrEmpty(validatorPrefix) | !string.IsNullOrEmpty(validatorSuffix)) nameManagement = NameManagement.Init(removePrefixes,removeSuffixes, validatorPrefix, validatorSuffix);
 
                 var validationClass = VisualStudioActions.RefreshValidationAsync(sourceClass, sourceProject,sourceFolder,nameManagement);
             }

@@ -382,7 +382,11 @@ namespace CodeFactory.Architecture.Blazor.Server
                                ?? throw new CodeFactoryException($"Could not load the entity that supports the ef model '{efModel.Name}', cannot refresh the EF repository.");
 
                 NameManagement modelValidatorNameManagement = null;
-                if(!string.IsNullOrEmpty(modelValidatorSuffix) | !string.IsNullOrEmpty(modelValidatorPrefix)) modelValidatorNameManagement = NameManagement.Init(null,null,modelValidatorPrefix, modelValidatorSuffix);
+
+                string removePrefixes = null;
+
+                string removeSuffixes = null;
+                if(!string.IsNullOrEmpty(modelValidatorSuffix) | !string.IsNullOrEmpty(modelValidatorPrefix)) modelValidatorNameManagement = NameManagement.Init(removePrefixes,removeSuffixes,modelValidatorPrefix, modelValidatorSuffix);
                     
 
                 var validation = (await VisualStudioActions.RefreshValidationAsync(appModel,appModelProject,appModelFolder,modelValidatorNameManagement))
