@@ -42,8 +42,8 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
                 throw new CodeFactoryException("Cannot load the abstraction contract project, cannot refresh the abstraction contract.");
 
             CsSource contractSource = (contractFolder != null
-                ? (await contractFolder.FindCSharpSourceByInterfaceNameAsync(sourceContract.Name))?.SourceCode
-                : (await contractProject.FindCSharpSourceByInterfaceNameAsync(sourceContract.Name))?.SourceCode)
+                ? (await contractFolder.FindCSharpSourceByInterfaceNameAsync(contractName))?.SourceCode
+                : (await contractProject.FindCSharpSourceByInterfaceNameAsync(contractName))?.SourceCode)
                 ?? await source.CreateCSharpAbstractionContractAsync(contractName, sourceContract, contractProject, contractFolder);
 
             return await source.UpdateCSharpAbstractionContractAsync(sourceContract, contractSource);

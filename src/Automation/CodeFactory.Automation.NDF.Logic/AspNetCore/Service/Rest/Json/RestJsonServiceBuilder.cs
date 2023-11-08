@@ -62,7 +62,7 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
             await source.AddSupportRestClassesAsync(modelProject);
             await source.AddJsonServiceExtensionsAsync(serviceProject);
 
-            var serviceFormattedName = $"{logicContract.Name.GenerateCSharpFormattedClassName()}Controller";
+            var serviceFormattedName = $"{serviceName}Controller";
 
             CsSource serviceSource = (await serviceFolder.FindCSharpSourceByClassNameAsync(serviceFormattedName))?.SourceCode
                                      ?? await source.CreateJsonRestServiceAsync(serviceName,logicContract, serviceProject, serviceFolder);

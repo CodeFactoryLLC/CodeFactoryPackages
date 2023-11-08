@@ -112,7 +112,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         /// <summary>
         /// Suffix to append to the service client name. 
         /// </summary>
-        public static string ServiceClientNameAppendSuffix = "ServiceClientNameAppendPrefix";
+        public static string ServiceClientNameAppendSuffix = "ServiceClientNameAppendSuffix";
         
 
         /// <summary>
