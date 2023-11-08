@@ -117,7 +117,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         /// <summary>
         /// Optional, suffix to assign to a repository when creating.
         /// </summary>
-        public static string RepositorySuffix = "RepositoryPrefix";
+        public static string RepositorySuffix = "RepositorySuffix";
 
         /// <summary>
         /// Optional, prefix to assign to a application model when creating.
@@ -231,6 +231,24 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                             Name = AppModelSuffix,
                             Guidance = "Optional, suffix to assign to the application model entity when it is created.",
                             Value = "AppModel"
+                        }
+                    )
+                     .AddParameter
+                    (
+                        new ConfigParameter
+                        { 
+                            Name = AppModelValidatorPrefix,
+                            Guidance = "Optional, prefix to assign to the application model entity validator when it is created."
+                            
+                        }
+                    )
+                    .AddParameter
+                    (
+                        new ConfigParameter
+                        { 
+                            Name = AppModelValidatorSuffix,
+                            Guidance = "Optional, suffix to assign to the application model entity validator when it is created.",
+                            Value = "Validator"
                         }
                     )
                 )

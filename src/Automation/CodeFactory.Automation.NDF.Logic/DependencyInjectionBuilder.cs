@@ -360,7 +360,7 @@ namespace CodeFactory.Automation.NDF.Logic
 
             else
             {
-                bool isFirstParameter = constructorData.Parameters.Count != 1;
+                bool isFirstParameter = true;
 
                 StringBuilder constructorSyntax = new StringBuilder();
 
