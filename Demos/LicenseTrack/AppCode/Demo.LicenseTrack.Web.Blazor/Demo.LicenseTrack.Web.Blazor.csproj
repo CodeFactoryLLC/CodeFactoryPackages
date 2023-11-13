@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blazored.FluentValidation" Version="2.1.0" />
+    <PackageReference Include="CodeFactory.NDF" Version="1.23111.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Demo.LicenseTrack.App.Model\Demo.LicenseTrack.App.Model.csproj" />
+    <ProjectReference Include="..\Demo.LicenseTrack.Client.Contracts\Demo.LicenseTrack.Client.Contracts.csproj" />
+    <ProjectReference Include="..\Demo.LicenseTrack.Client.Transport.Rest\Demo.LicenseTrack.Client.Transport.Rest.csproj" />
+    <ProjectReference Include="..\Demo.LicenseTrack.Transport.Rest.Model\Demo.LicenseTrack.Transport.Rest.Model.csproj" />
+  </ItemGroup>
+
+</Project>

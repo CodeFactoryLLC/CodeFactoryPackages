@@ -1,0 +1,6 @@
+@Demo.LicenseTrack.Transport.Rest_HostAddress = http://localhost:5234
+
+GET {{Demo.LicenseTrack.Transport.Rest_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
