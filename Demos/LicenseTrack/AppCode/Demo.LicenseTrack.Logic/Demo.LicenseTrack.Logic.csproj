@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Demo.LicenseTrack.App.Model\Demo.LicenseTrack.App.Model.csproj" />
+    <ProjectReference Include="..\Demo.LicenseTrack.Data.Contracts\Demo.LicenseTrack.Data.Contracts.csproj" />
     <ProjectReference Include="..\Demo.LicenseTrack.Logic.Contracts\Demo.LicenseTrack.Logic.Contracts.csproj" />
   </ItemGroup>
 

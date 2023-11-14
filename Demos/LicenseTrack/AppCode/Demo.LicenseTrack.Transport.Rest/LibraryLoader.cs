@@ -18,7 +18,13 @@ namespace Demo.LicenseTrack.Transport.Rest
         /// <param name="configuration">The source configuration to provide for dependency injection.</param>
         protected override void LoadLibraries(IServiceCollection serviceCollection, IConfiguration configuration)
         {
-            //Intentionally blank
+            var appModelLoader = new App.Model.LibraryLoader();
+            var logicLoader = new Logic.LibraryLoader();
+            var sqlLoader = new Data.Sql.LibraryLoader();
+
+            appModelLoader.Load(serviceCollection, configuration);
+            logicLoader.Load(serviceCollection, configuration);
+            sqlLoader.Load(serviceCollection, configuration);
         }
 
 

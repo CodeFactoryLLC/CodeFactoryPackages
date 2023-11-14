@@ -1,10 +1,19 @@
 using Demo.LicenseTrack.Web.Blazor.Components;
+using Microsoft.FluentUI.AspNetCore.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+//Adding httpclient to support fluent ui
+builder.Services.AddHttpClient();
+
+//Adding fluent ui support
+builder.Services.AddFluentUIComponents();
+
+
 
 var app = builder.Build();
 

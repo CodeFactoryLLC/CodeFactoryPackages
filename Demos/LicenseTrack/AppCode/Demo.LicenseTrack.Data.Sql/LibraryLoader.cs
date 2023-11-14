@@ -1,4 +1,5 @@
 ﻿using CodeFactory.NDF;
+using Demo.LicenseTrack.Data.Sql.Model;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -34,11 +35,15 @@ namespace Demo.LicenseTrack.Data.Sql
         }
 
 
+
+
+
+
         /// <summary>
-        /// Loads transient service registrations with the hosting DI container.
+        /// Automated registration of classes using transient registration.
         /// </summary>
-        /// <param name="serviceCollection">The dependency injection provider to register services with.</param>
-        /// <param name="configuration">The source configuration to provide for dependency injection.</param>
+        /// <param name="serviceCollection">The service collection to register services.</param>
+        /// <param name="configuration">The configuration data used with register of services.</param>
         protected override void LoadRegistration(IServiceCollection serviceCollection, IConfiguration configuration)
         {
             //Intentionally blank

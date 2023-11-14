@@ -1,0 +1,1 @@
+﻿Scaffold-DbContext 'Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\github\codefactoryllc\CodeFactoryPackages\Demos\LicenseTrack\AppCode\Demo.LicenseTrack.Transport.Rest\LicenseTrack.mdf;Integrated Security=True' Microsoft.EntityFrameworkCore.SqlServer -context LicenseTrackContext -NoOnConfiguring -DataAnnotations -Force

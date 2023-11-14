@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Demo.LicenseTrack.App.Model\Demo.LicenseTrack.App.Model.csproj" />
+    <ProjectReference Include="..\Demo.LicenseTrack.Client.Contracts\Demo.LicenseTrack.Client.Contracts.csproj" />
     <ProjectReference Include="..\Demo.LicenseTrack.Transport.Rest.Model\Demo.LicenseTrack.Transport.Rest.Model.csproj" />
   </ItemGroup>
 

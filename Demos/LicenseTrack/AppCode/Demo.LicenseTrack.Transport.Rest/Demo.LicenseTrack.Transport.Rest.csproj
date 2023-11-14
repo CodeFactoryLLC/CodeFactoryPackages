@@ -4,9 +4,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <InvariantGlobalization>true</InvariantGlobalization>
+    <InvariantGlobalization>false</InvariantGlobalization>
   </PropertyGroup>
 
+	
   <ItemGroup>
     <PackageReference Include="CodeFactory.NDF" Version="1.23111.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
@@ -20,6 +21,12 @@
     <ProjectReference Include="..\Demo.LicenseTrack.Logic.Contracts\Demo.LicenseTrack.Logic.Contracts.csproj" />
     <ProjectReference Include="..\Demo.LicenseTrack.Logic\Demo.LicenseTrack.Logic.csproj" />
     <ProjectReference Include="..\Demo.LicenseTrack.Transport.Rest.Model\Demo.LicenseTrack.Transport.Rest.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="LicenseTrack.mdf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
