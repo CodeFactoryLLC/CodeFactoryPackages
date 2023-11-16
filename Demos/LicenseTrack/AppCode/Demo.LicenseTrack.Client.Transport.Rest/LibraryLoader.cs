@@ -35,6 +35,7 @@ namespace Demo.LicenseTrack.Client.Transport.Rest
 
 
 
+
         /// <summary>
         /// Automated registration of classes using transient registration.
         /// </summary>
@@ -42,7 +43,8 @@ namespace Demo.LicenseTrack.Client.Transport.Rest
         /// <param name="configuration">The configuration data used with register of services.</param>
         protected override void LoadRegistration(IServiceCollection serviceCollection, IConfiguration configuration)
         {
-            //Intentionally blank
+            //This method was auto generated, do not modify by hand!
+            serviceCollection.AddTransient<Demo.LicenseTrack.Client.Contracts.ICustomerClient>(sp => new CustomerClient(sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<CustomerClient>>(), sp.GetRequiredService<RestDemoLicenseTrackTransportRestServiceUrl>()));
         }
 
 

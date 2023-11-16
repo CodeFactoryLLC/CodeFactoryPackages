@@ -1,4 +1,5 @@
 ﻿using CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json;
+using CodeFactory.Automation.Standard.Logic;
 using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.SolutionExplorer;
@@ -11,8 +12,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
-namespace CodeFactory.Architecture.AspNetCore.Service.Rest
+namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 {
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
@@ -67,26 +69,31 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
         /// </summary>
         public static string ModelFolder = "ModelFolder";
 
-        ///// <summary>
-        ///// The target project that the abstraction logic will be hosted.
-        ///// </summary>
-        //public static string AbstractionProject = "AbstractionProject";
+        /// <summary>
+        /// The target project where abstraction contracts will be created.
+        /// </summary>
+        public static string ContractProject = "ContractProject";
 
-        ///// <summary>
-        ///// The target folder where abstraction logic will be hosted, this is optional.
-        ///// </summary>
-        //public static string AbstractionFolder = "AbstractionFolder";
+        /// <summary>
+        /// The target folder where abstraction contracts will be created, this is optional
+        /// </summary>
+        public static string ContractFolder = "ContractFolder";
 
-        ///// <summary>
-        ///// The target project where abstraction contracts will be created.
-        ///// </summary>
-        //public static string ContractProject = "ContractProject";
+        /// <summary>
+        /// Comma separated list of prefixes to remove from the logc contract when creating the service name.
+        /// </summary>
+        public static string ServiceNameRemovePrefixes = "ServiceNameRemovePrefixes";
 
-        ///// <summary>
-        ///// The target folder where abstraction contracts will be created, this is optional
-        ///// </summary>
-        //public static string ContractFolder = "ContractFolder";
+        /// <summary>
+        /// Comma separated list of suffixes to remove from the logic contract when creating the service name.
+        /// </summary>
+        public static string ServiceNameRemoveSuffixes = "ServiceNameRemoveSuffixes";
 
+        /// <summary>
+        /// Prefix to start the service name with.
+        /// </summary>
+        public static string ServiceNameAppendPrefix = "ServiceNameAppendPrefix";
+        
         /// <summary>
         /// Loads the external configuration definition for this command.
         /// </summary>
@@ -103,13 +110,38 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
                         Guidance = "Enter the fully project name for the logic contracts project."
                     }
                         .AddFolder
-            (
+                        (
                             new ConfigFolder
                             {
                                 Name = ExecutionFolder,
                                 Required = false,
                                 Guidance =
                                     "Optional, set the relative path from the root of the project. If it is more then one directory deep then use forward slash instead of back slashes."
+                            }
+                        )
+                        .AddParameter
+                        (
+                            new ConfigParameter
+                            {
+                                Name = ServiceNameRemovePrefixes,
+                                Guidance = "Optional, provide a comma separated value of each prefix to check for to be removed from the logic contract name when creating a service name."
+                            }
+                        )
+                        .AddParameter
+                        (
+                            new ConfigParameter
+                            {
+                                Name = ServiceNameRemoveSuffixes,
+                                Guidance = "Optional, provide a comma separated value of each suffix to check for to be removed from the logic contract name when creating a service name.",
+                                Value = "Logic"
+                            }
+                        )
+                        .AddParameter
+                        (
+                            new ConfigParameter
+                            {
+                                Name = ServiceNameAppendPrefix,
+                                Guidance = "Optional, provide the prefix to append to the service name."
                             }
                         )
                 )
@@ -122,7 +154,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
                                 "Enter the full project name for the project that hosts the WebAPI service implementation of the logic contract."
                     }
                         .AddFolder
-            (
+                        (
                             new ConfigFolder
                             {
                                 Name = ServiceFolder,
@@ -142,7 +174,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
                                 "Enter the full project name for the project that hosts the rest service models used by the services."
                     }
                         .AddFolder
-            (
+                        (
                             new ConfigFolder
                             {
                                 Name = ModelFolder,
@@ -152,7 +184,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
                             }
                         )
                 );
-
+                
             return command;
         }
         #endregion
@@ -217,11 +249,25 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
                 var modelFolder =
                     await VisualStudioActions.GetProjectFolderFromConfigAsync(command.Project(ModelProject), ModelFolder);
 
+                var contractFolder =
+                    await VisualStudioActions.GetProjectFolderFromConfigAsync(command.Project(ContractProject), ContractFolder);
 
-                var serviceClass = await VisualStudioActions.RefreshJsonRestService(logicContract, serviceProject, serviceFolder,
-                    modelProject,modelFolder);
+                //Execution command parameters.
+                var serviceNameRemovePrefixes = command.ExecutionProject.ParameterValue(ServiceNameRemovePrefixes);
+                var serviceNameRemoveSuffixes = command.ExecutionProject.ParameterValue(ServiceNameRemoveSuffixes);
+                var serviceNameAppendPrefix = command.ExecutionProject.ParameterValue(ServiceNameAppendPrefix);
 
+                var serviceNameManagement = NameManagement.Init(serviceNameRemovePrefixes,serviceNameRemoveSuffixes,serviceNameAppendPrefix,null);
 
+                var serviceName = serviceNameManagement.FormatName(logicContract.Name.GenerateCSharpFormattedClassName());
+
+                var serviceClass = await VisualStudioActions.RefreshJsonRestService(serviceName,logicContract, serviceProject, serviceFolder,
+                    modelProject,modelFolder)
+                    ?? throw new CodeFactoryException("Could not refresh the rest json service.");
+            }
+            catch(CodeFactoryException cfException)
+            { 
+                MessageBox.Show(cfException.Message, "Automation Error", MessageBoxButton.OK, MessageBoxImage.Error);    
             }
             catch (Exception unhandledError)
             {

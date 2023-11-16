@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace CodeFactory.Architecture.AspNetCore.Service.Rest
+namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 {
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
@@ -210,14 +210,13 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
 
                 var boundChecks = new List<IBoundsCheckBlock>
                 { 
-                  
-                    new BoundsCheckBlockNullNDFException(true,loggerBlock),
-                    new BoundsCheckBlockStringNDFException(true,loggerBlock)
+                    new BoundsCheckBlockStringNDFException(true,loggerBlock),
+                    new BoundsCheckBlockNullNDFException(true,loggerBlock)
                 };
 
                 var tryBlock = new TryBlockStandard(loggerBlock,catchBlocks);
 
-                var updatedlogicClass = await VisualStudioActions.AddClassMissingMembersAsync(result.SourceCode,logicClass,false,loggerBlock,Microsoft.Extensions.Logging.LogLevel.Information,boundChecks,tryBlock,missingMembers);
+                var updatedLogicClass = await VisualStudioActions.AddClassMissingMembersAsync(result.SourceCode,logicClass,false,loggerBlock,Microsoft.Extensions.Logging.LogLevel.Information,boundChecks,tryBlock,missingMembers);
                 
             }
             catch (CodeFactoryException cfException)

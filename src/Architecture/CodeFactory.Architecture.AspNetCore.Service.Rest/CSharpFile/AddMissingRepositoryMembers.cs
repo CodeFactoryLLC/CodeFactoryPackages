@@ -16,7 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace CodeFactory.Architecture.AspNetCore.Service.Rest
+namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 {
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.

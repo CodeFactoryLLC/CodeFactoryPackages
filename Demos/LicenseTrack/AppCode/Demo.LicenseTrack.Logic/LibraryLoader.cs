@@ -36,6 +36,8 @@ namespace Demo.LicenseTrack.Logic
 
 
 
+
+
         /// <summary>
         /// Automated registration of classes using transient registration.
         /// </summary>
@@ -43,7 +45,8 @@ namespace Demo.LicenseTrack.Logic
         /// <param name="configuration">The configuration data used with register of services.</param>
         protected override void LoadRegistration(IServiceCollection serviceCollection, IConfiguration configuration)
         {
-            //Intentionally blank
+            //This method was auto generated, do not modify by hand!
+            serviceCollection.AddTransient<Demo.LicenseTrack.Logic.Contracts.ICustomerLogic>(sp => new CustomerLogic(sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<CustomerLogic>>(), sp.GetRequiredService<Demo.LicenseTrack.Data.Contracts.ICustomerRepository>()));
         }
 
 

@@ -1,4 +1,5 @@
-﻿using CodeFactory.WinVs;
+﻿using CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile;
+using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.IDE;
 using CodeFactory.WinVs.Logging;
@@ -11,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodeFactory.Architecture.AspNetCore.Service.Rest
+namespace CodeFactory.Architecture.AspNetCore.Service.Rest.IDE
 {
     /// <summary>
     /// Code factory command that is executed when the solution is loaded. This command only gets called one time on load of the solution.
@@ -57,6 +58,9 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
 
                 var addMissingLogicMembers = new AddMissingLogicMembers(null, null);
                 addMissingLogicMembers.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
+
+                var refreshLogic = new RefreshLogic(null, null);
+                refreshLogic.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
                 ConfigManager.LoadConfiguration(result, "Automation", VisualStudioActions);
             }

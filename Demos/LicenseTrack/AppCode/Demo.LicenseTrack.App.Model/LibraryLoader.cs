@@ -36,6 +36,7 @@ namespace Demo.LicenseTrack.App.Model
 
 
 
+
         /// <summary>
         /// Automated registration of classes using transient registration.
         /// </summary>
@@ -43,7 +44,8 @@ namespace Demo.LicenseTrack.App.Model
         /// <param name="configuration">The configuration data used with register of services.</param>
         protected override void LoadRegistration(IServiceCollection serviceCollection, IConfiguration configuration)
         {
-            //Intentionally blank
+            //This method was auto generated, do not modify by hand!
+            serviceCollection.AddTransient<FluentValidation.IValidator<CustomerAppModel>, CustomerAppModelValidator>();
         }
 
 
