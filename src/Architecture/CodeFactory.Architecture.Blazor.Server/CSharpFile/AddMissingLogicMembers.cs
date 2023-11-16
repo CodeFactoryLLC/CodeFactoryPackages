@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace CodeFactory.Architecture.Blazor.Server
+namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 {
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
@@ -210,9 +210,8 @@ namespace CodeFactory.Architecture.Blazor.Server
 
                 var boundChecks = new List<IBoundsCheckBlock>
                 { 
-                  
-                    new BoundsCheckBlockNullNDFException(true,loggerBlock),
-                    new BoundsCheckBlockStringNDFException(true,loggerBlock)
+                    new BoundsCheckBlockStringNDFException(true,loggerBlock),
+                    new BoundsCheckBlockNullNDFException(true,loggerBlock)
                 };
 
                 var tryBlock = new TryBlockStandard(loggerBlock,catchBlocks);

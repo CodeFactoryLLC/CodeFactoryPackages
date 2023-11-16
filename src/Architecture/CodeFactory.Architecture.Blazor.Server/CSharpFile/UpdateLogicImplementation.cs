@@ -1,4 +1,5 @@
-﻿using CodeFactory.Automation.Standard.Logic;
+﻿using CodeFactory.Automation.NDF.Logic.General;
+using CodeFactory.Automation.Standard.Logic;
 using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.SolutionExplorer;
@@ -11,8 +12,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
-namespace CodeFactory.Architecture.AspNetCore.Service.Rest
+namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 {
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
@@ -50,12 +52,12 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
         /// <summary>
         /// List of prefixes to be removed from the interface definition.
         /// </summary>
-        public static string RepoPrefix = "RepoPrefix";
+        public static string RemoveRepoPrefix = "RemoveRepoPrefix";
 
         /// <summary>
         /// List of suffixes to be removed from the interface definition.
         /// </summary>
-        public static string RepoSuffix = "RepoSuffix";
+        public static string RemoveRepoSuffix = "RepoSuffix";
 
         /// <summary>
         /// The project the logic contract can be found in.
@@ -115,7 +117,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
                 (
                     new ConfigParameter
                     { 
-                        Name = RepoPrefix,
+                        Name = RemoveRepoPrefix,
                         Guidance = "List of prefixes to be removed from the beginning of the contract name."
                         
                     }
@@ -124,7 +126,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
                 (
                     new ConfigParameter
                     { 
-                        Name = RepoSuffix,
+                        Name = RemoveRepoSuffix,
                         Guidance = "List of suffixes to be removed from the end of the contract name."
                         
                     }
@@ -218,8 +220,8 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
 
                 if(isEnabled ) 
                 {
-                    var repoPrefix = command.ExecutionProject.ParameterValue(RepoPrefix);
-                    var repoSuffix = command.ExecutionProject.ParameterValue(RepoSuffix);
+                    var repoPrefix = command.ExecutionProject.ParameterValue(RemoveRepoPrefix);
+                    var repoSuffix = command.ExecutionProject.ParameterValue(RemoveRepoSuffix);
                     isEnabled = IsRepositoryContract(repoInterface,repoPrefix,repoSuffix);
                 }
             }
@@ -248,23 +250,34 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
                 var repoContract = result.SourceCode?.Interfaces.FirstOrDefault()
                     ?? throw new CodeFactoryException("Could not load the repository contract cannot update the logic implementation.");
 
-                var logicContractProject = await VisualStudioActions.GetProjectFromConfigAsync(command.Project(LogicContractProject));
+                var logicContractProject = await VisualStudioActions.GetProjectFromConfigAsync(command.Project(LogicContractProject))
+                    ?? throw new CodeFactoryException("The logic contract project could not be loaded, cannot refresh the logic class.");
 
                 var logicContractProjectFolder = await VisualStudioActions.GetProjectFolderFromConfigAsync(command.Project(LogicContractProject),LogicContractProjectFolder);
 
-                var repoPrefix = command.ExecutionProject.ParameterValue(RepoPrefix);
-                var repoSuffix = command.ExecutionProject.ParameterValue(RepoSuffix);
+                var logicProject = await VisualStudioActions.GetProjectFromConfigAsync(command.Project(LogicProject))
+                    ?? throw new CodeFactoryException("The logic project could not be loaded, cannot refresh the logic class.");
+
+                var logicProjectFolder = await VisualStudioActions.GetProjectFolderFromConfigAsync(command.Project(LogicProject),LogicProjectFolder);
+
+                var repoRemovePrefix = command.ExecutionProject.ParameterValue(RemoveRepoPrefix);
+                var repoRemoveSuffix = command.ExecutionProject.ParameterValue(RemoveRepoSuffix);
 
                 var logicPrefix = command.Project(LogicContractProject)?.ParameterValue(LogicPrefix);
                 var logicSuffix = command.Project(LogicContractProject)?.ParameterValue(LogicSuffix);
 
-                var removePrefixes = repoPrefix == null ? null: new List<string>(repoPrefix.Split(','));
-                var removeSuffixes = repoSuffix == null ? null: new List<string>(repoSuffix.Split(','));
-                var nameManagement = NameManagement.Init(removePrefixes,removeSuffixes,logicPrefix,logicSuffix);
+
+                var logicName = NameManagement.Init(repoRemovePrefix,repoRemoveSuffix,logicPrefix,logicSuffix).FormatName(repoContract.Name.GenerateCSharpFormattedClassName());
                 
-                var logicContract = await VisualStudioActions.CloneInterfaceAsync(repoContract,false,logicContractProject,
-                    logicContractProjectFolder,nameManagement,"Logic contract implementation.");
+                var logicContract = await VisualStudioActions.CloneInterfaceAsync($"I{logicName}", repoContract,false,logicContractProject,
+                    logicContractProjectFolder,"Logic contract implementation.");
+
+                var logicClass = await VisualStudioActions.RefreshLogicAsync(logicName,$"I{logicName}",logicProject,logicContractProject,logicFolder:logicProjectFolder,contractFolder:logicContractProjectFolder);
                 
+            }
+            catch (CodeFactoryException codeFactoryError)
+            {
+                MessageBox.Show(codeFactoryError.Message, "Automation Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception unhandledError)
             {

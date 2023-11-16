@@ -19,17 +19,17 @@ namespace CodeFactory.Automation.Standard.Logic
         /// Clones an existing interface and creates a new interface definition and clones all the methods in the interface.
         /// </summary>
         /// <param name="source">CodeFactory automation.</param>
+        /// <param name="interfaceName">The name of the new interface that will be created as a clone.</param>
         /// <param name="sourceInterface">The source interface to be cloned.</param>
         /// <param name="includeAttributes">Flag that determines if the attributes on member should be included in the implementation of the new member, default is false.</param>
         /// <param name="targetProject">The target project the interface will be created in, optional default is null.</param>
         /// <param name="targetFolder">The target project folder the interface will be crearted in, optional default is null.</param>
-        /// <param name="nameManagement">Optional information used to format the name of the new interface definition, default is null.</param>
         /// <param name="summaryText">The summary text to put in the XML documentation for the summary of the interface.</param>
         /// <returns>The target interface data model.</returns>
         /// <exception cref="CodeFactoryException">Raised when required data is missing or processing errors occured.</exception>
 
-        public static async  Task<CsInterface> CloneInterfaceAsync(this IVsActions source,CsInterface sourceInterface, 
-            bool includeAttributes = false, VsProject targetProject = null, VsProjectFolder targetFolder = null, NameManagement nameManagement = null, string summaryText = null)
+        public static async  Task<CsInterface> CloneInterfaceAsync(this IVsActions source,string interfaceName, CsInterface sourceInterface, 
+            bool includeAttributes = false, VsProject targetProject = null, VsProjectFolder targetFolder = null, string summaryText = null)
         { 
             CsInterface result = null;
             
@@ -41,8 +41,7 @@ namespace CodeFactory.Automation.Standard.Logic
 
             CsSource targetSource = null;
 
-            string targetInterfaceName = nameManagement != null
-                ? nameManagement.FormatName(sourceInterface.Name,"I") : sourceInterface.Name;
+            string targetInterfaceName = interfaceName;
 
             if(targetFolder != null) targetSource = (await targetFolder.FindCSharpSourceByInterfaceNameAsync(targetInterfaceName))?.SourceCode;
 

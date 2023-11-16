@@ -16,11 +16,24 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
     /// </summary>
     public static class RestJsonCSharpAbstractionBuilder
     {
-        public static async Task<CsInterface> RefreshCSharpAbstractionContractAsync(this IVsActions source,
+        /// <summary>
+        /// Refreshes the interface definition of an service abstraction client.
+        /// </summary>
+        /// <param name="source">CodeFactory Automation.</param>
+        /// <param name="contractName">The name of the abstraction contract to refresh.</param>
+        /// <param name="sourceContract">The source contract used to refresh the abstraction contract.</param>
+        /// <param name="contractProject">The project the abstraction is created in.</param>
+        /// <param name="contractFolder">Optional, the target project folder the abstraction contract should be located in. Default value is null.</param>
+        /// <returns>The inteface model that represents the abstraction contract.</returns>
+        /// <exception cref="CodeFactoryException">Raised if required information is missing or automation errors occurred.</exception>
+        public static async Task<CsInterface> RefreshCSharpAbstractionContractAsync(this IVsActions source, string contractName,
             CsInterface sourceContract, VsProject contractProject, VsProjectFolder contractFolder = null)
         {
             if (source == null)
                 throw new CodeFactoryException("CodeFactory automation was not provided cannot refresh the abstraction contract.");
+
+            if (string.IsNullOrEmpty(contractName))
+                throw new CodeFactoryException("No contract name was provided, cannot refresh the abstraction contract.");
 
             if (sourceContract == null)
                 throw new CodeFactoryException("Cannot load the source contract, cannot refresh the abstraction contract.");
@@ -29,19 +42,32 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
                 throw new CodeFactoryException("Cannot load the abstraction contract project, cannot refresh the abstraction contract.");
 
             CsSource contractSource = (contractFolder != null
-                ? (await contractFolder.FindCSharpSourceByInterfaceNameAsync(sourceContract.Name))?.SourceCode
-                : (await contractProject.FindCSharpSourceByInterfaceNameAsync(sourceContract.Name))?.SourceCode)
-                ?? await source.CreateCSharpAbstractionContractAsync(sourceContract, contractProject, contractFolder);
+                ? (await contractFolder.FindCSharpSourceByInterfaceNameAsync(contractName))?.SourceCode
+                : (await contractProject.FindCSharpSourceByInterfaceNameAsync(contractName))?.SourceCode)
+                ?? await source.CreateCSharpAbstractionContractAsync(contractName, sourceContract, contractProject, contractFolder);
 
             return await source.UpdateCSharpAbstractionContractAsync(sourceContract, contractSource);
         }
 
-        private static async Task<CsSource> CreateCSharpAbstractionContractAsync(this IVsActions source,
+        /// <summary>
+        /// Creates the interface definition of an service abstraction client.
+        /// </summary>
+        /// <param name="source">CodeFactory Automation.</param>
+        /// <param name="contractName">The name of the abstraction contract to refresh.</param>
+        /// <param name="sourceContract">The source contract used to refresh the abstraction contract.</param>
+        /// <param name="contractProject">The project the abstraction is created in.</param>
+        /// <param name="contractFolder">Optional, the target project folder the abstraction contract should be located in. Default value is null.</param>
+        /// <returns>The source code that hosts the inteface model that represents the abstraction contract.</returns>
+        /// <exception cref="CodeFactoryException">Raised if required information is missing or automation errors occurred.</exception>
+        private static async Task<CsSource> CreateCSharpAbstractionContractAsync(this IVsActions source, string contractName,
             CsInterface sourceContract,
             VsProject contractProject, VsProjectFolder contractFolder = null)
         {
             if (source == null)
                 throw new CodeFactoryException("CodeFactory automation was not provided cannot create the abstraction contract.");
+
+            if (string.IsNullOrEmpty(contractName))
+                throw new CodeFactoryException("No contract name was provided, cannot refresh the abstraction contract.");
 
             if (sourceContract == null)
                 throw new CodeFactoryException("Cannot load the source contract, cannot create the abstraction contract.");
@@ -61,24 +87,32 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
             contractFormatter.AppendCodeLine(0, $"namespace {defaultNamespace}");
             contractFormatter.AppendCodeLine(0, "{");
             contractFormatter.AppendCodeLine(1, "/// <summary>");
-            contractFormatter.AppendCodeLine(1, $"/// Abstract implementation that supports '{sourceContract.Name.GenerateCSharpFormattedClassName()}'/>");
+            contractFormatter.AppendCodeLine(1, $"/// Abstract implementation that supports '{contractName.GenerateCSharpFormattedClassName()}'/>");
             contractFormatter.AppendCodeLine(1, "/// </summary>");
-            contractFormatter.AppendCodeLine(1, $"public interface {sourceContract.Name}");
+            contractFormatter.AppendCodeLine(1, $"public interface {contractName}");
             contractFormatter.AppendCodeLine(1, "{");
 
 
             contractFormatter.AppendCodeLine(1, "}");
             contractFormatter.AppendCodeLine(0, "}");
 
-            var doc = contractFolder != null ? await contractFolder.AddDocumentAsync($"{sourceContract.Name}.cs", contractFormatter.ReturnSource())
-                : await contractProject.AddDocumentAsync($"{sourceContract.Name}.cs", contractFormatter.ReturnSource());
+            var doc = contractFolder != null ? await contractFolder.AddDocumentAsync($"{contractName}.cs", contractFormatter.ReturnSource())
+                : await contractProject.AddDocumentAsync($"{contractName}.cs", contractFormatter.ReturnSource());
 
             return doc == null
-                ? throw new CodeFactoryException($"Failed to create the abstraction contract '{sourceContract.Name}'.")
+                ? throw new CodeFactoryException($"Failed to create the abstraction contract '{contractName}'.")
                 : await doc.GetCSharpSourceModelAsync();
 
         }
 
+        /// <summary>
+        /// Updates the interface definition of an service abstraction client.
+        /// </summary>
+        /// <param name="source">CodeFactory Automation.</param>
+        /// <param name="contractName">The name of the abstraction contract to refresh.</param>
+        /// <param name="sourceContract">The source contract used to refresh the abstraction contract.</param>
+        /// <returns>The inteface model that represents the abstraction contract.</returns>
+        /// <exception cref="CodeFactoryException">Raised if required information is missing or automation errors occurred.</exception>
         private static async Task<CsInterface> UpdateCSharpAbstractionContractAsync(this IVsActions source,
             CsInterface sourceContract, CsSource contractSource)
         {
@@ -123,11 +157,28 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
 
         }
 
-        public static async Task<CsClass> RefreshAbstractionClass(this IVsActions source, CsClass serviceClass,
+        /// <summary>
+        /// Refreshes the instance of the abstraction client class.
+        /// </summary>
+        /// <param name="source">CodeFactory Automation.</param>
+        /// <param name="clientName">The class name of the client to be refreshed.</param>
+        /// <param name="serviceClass">The source service class the client is calling.</param>
+        /// <param name="abstractionContract">The abstraction interface the client consumes.</param>
+        /// <param name="serviceProject">The project that hosts the service being consumed.</param>
+        /// <param name="abstractionProject">The abstraction project that hosts the client.</param>
+        /// <param name="modelProject">The service model project that contains the service models.</param>
+        /// <param name="abstractionFolder">The project folder where the abstaction client is located.</param>
+        /// <param name="modelFolder">The project folder where the model data can be found for the client.</param>
+        /// <returns>The client class model that was refreshed.</returns>
+        /// <exception cref="CodeFactoryException">Raised if configuration information is missing or automation errors occurred.</exception>
+        public static async Task<CsClass> RefreshAbstractionClass(this IVsActions source, string clientName, CsClass serviceClass,
             CsInterface abstractionContract, VsProject serviceProject, VsProject abstractionProject, VsProject modelProject, VsProjectFolder abstractionFolder = null, VsProjectFolder modelFolder = null)
         {
             if (source == null)
                 throw new CodeFactoryException("CodeFactory automation was not provided cannot refresh the abstraction.");
+
+            if (string.IsNullOrEmpty(clientName))
+                throw new CodeFactoryException("The client name was not provided, cannot refresh the abstraction.");
 
             if (abstractionContract == null)
                 throw new CodeFactoryException("Cannot load the abstraction contract, cannot refresh the abstraction.");
@@ -154,17 +205,43 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
 
             var abstractionSource = (abstractionFolder != null
                 ? (await abstractionFolder.FindCSharpSourceByClassNameAsync(abstractionClassName))?.SourceCode
-                : (await abstractionProject.FindCSharpSourceByClassNameAsync(abstractionClassName))?.SourceCode)
-                ?? await source.CreateAbstractionClassAsync(abstractionContract, serviceProject, abstractionProject, abstractionFolder);
+                : (await abstractionProject.FindCSharpSourceByClassNameAsync(abstractionClassName))?.SourceCode);
 
-            return await source.UpdateAbstractionClassAsync(abstractionSource, serviceClass, abstractionContract, serviceProject, abstractionProject, modelProject, abstractionFolder, modelFolder);
+            var abstractionCreated = false;
+            if(abstractionSource == null)
+            { 
+                abstractionCreated = true;
+                abstractionSource = await source.CreateAbstractionClassAsync(clientName, abstractionContract, serviceProject, abstractionProject, abstractionFolder)
+                    ?? throw new CodeFactoryException($"Could not create the client abstraction '{clientName}', cannot refresh the abstraction client.");
+            }
+           
+            var clientClass = await source.UpdateAbstractionClassAsync(abstractionSource, serviceClass, abstractionContract, serviceProject, abstractionProject, modelProject, abstractionFolder, modelFolder);
+
+            if(abstractionCreated) await source.RegisterTransientClassesAsync(abstractionProject,false);
+
+            return clientClass;
         }
 
-        private static async Task<CsSource> CreateAbstractionClassAsync(this IVsActions source,
+        /// <summary>
+        /// Creates the instance of the abstraction client class.
+        /// </summary>
+        /// <param name="source">CodeFactory Automation.</param>
+        /// <param name="clientName">The class name of the client to be refreshed.</param>
+        /// <param name="serviceClass">The source service class the client is calling.</param>
+        /// <param name="abstractionContract">The abstraction interface the client consumes.</param>
+        /// <param name="serviceProject">The project that hosts the service being consumed.</param>
+        /// <param name="abstractionProject">The abstraction project that hosts the client.</param>
+        /// <param name="abstractionFolder">The project folder where the abstaction client is located.</param>
+        /// <returns>The source code that containes the client class model that was created.</returns>
+        /// <exception cref="CodeFactoryException">Raised if configuration information is missing or automation errors occurred.</exception>
+        private static async Task<CsSource> CreateAbstractionClassAsync(this IVsActions source, string clientName,
             CsInterface abstractionContract, VsProject serviceProject, VsProject abstractionProject, VsProjectFolder abstractionFolder = null)
         {
             if (source == null)
                 throw new CodeFactoryException("CodeFactory automation was not provided cannot create the abstraction.");
+
+            if (string.IsNullOrEmpty(clientName))
+                throw new CodeFactoryException("The client name was not provided, cannot create the abstraction.");
 
             if (abstractionContract == null)
                 throw new CodeFactoryException("Cannot load the abstraction contract, cannot create the abstraction.");
@@ -181,7 +258,7 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
 
             if (string.IsNullOrEmpty(sourceNamespace)) throw new CodeFactoryException("Could not identify the target namespace for the abstraction, abstraction cannot be created.");
 
-            var abstractionName = abstractionContract.Name.GenerateCSharpFormattedClassName();
+            var abstractionName = clientName;
 
             var sourceFormatter = new SourceFormatter();
 
@@ -234,6 +311,19 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
 
         }
 
+        /// <summary>
+        /// Updates the instance of the abstraction client class.
+        /// </summary>
+        /// <param name="source">CodeFactory Automation.</param>
+        /// <param name="serviceClass">The source service class the client is calling.</param>
+        /// <param name="abstractionContract">The abstraction interface the client consumes.</param>
+        /// <param name="serviceProject">The project that hosts the service being consumed.</param>
+        /// <param name="abstractionProject">The abstraction project that hosts the client.</param>
+        /// <param name="modelProject">The service model project that contains the service models.</param>
+        /// <param name="abstractionFolder">The project folder where the abstaction client is located.</param>
+        /// <param name="modelFolder">The project folder where the model data can be found for the client.</param>
+        /// <returns>The client class model that was refreshed.</returns>
+        /// <exception cref="CodeFactoryException">Raised if configuration information is missing or automation errors occurred.</exception>
         private static async Task<CsClass> UpdateAbstractionClassAsync(this IVsActions source, CsSource abstractionSource, CsClass serviceClass,
             CsInterface abstractionContract, VsProject serviceProject, VsProject abstractionProject, VsProject modelProject, VsProjectFolder abstractionFolder = null, VsProjectFolder modelFolder = null)
         {

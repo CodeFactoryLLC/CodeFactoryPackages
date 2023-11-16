@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
-
-namespace CodeFactory.Architecture.Blazor.Server
+namespace CodeFactory.Architecture.AspNetCore.Service.Rest.Project
 {
 /// <summary>
     /// Code factory command for automation of a project when selected from solution explorer.
@@ -84,6 +84,10 @@ namespace CodeFactory.Architecture.Blazor.Server
             try
             {
                 await VisualStudioActions.RegisterTransientClassesAsync(result);
+            }
+            catch (CodeFactoryException codeFactoryError)
+            {
+                MessageBox.Show(codeFactoryError.Message, "Automation Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception unhandledError)
             {

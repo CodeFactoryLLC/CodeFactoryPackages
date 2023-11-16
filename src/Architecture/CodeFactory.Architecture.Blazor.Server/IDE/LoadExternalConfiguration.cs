@@ -1,4 +1,5 @@
-﻿using CodeFactory.WinVs;
+﻿using CodeFactory.Architecture.Blazor.Server.CSharpFile;
+using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.IDE;
 using CodeFactory.WinVs.Logging;
@@ -11,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodeFactory.Architecture.Blazor.Server
+namespace CodeFactory.Architecture.Blazor.Server.IDE
 {
     /// <summary>
     /// Code factory command that is executed when the solution is loaded. This command only gets called one time on load of the solution.
@@ -60,6 +61,9 @@ namespace CodeFactory.Architecture.Blazor.Server
 
                 var addMissingControllerMembers = new AddMissingControllerMembers(null, null);
                 addMissingControllerMembers.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
+
+                var refreshLogic = new RefreshLogic(null, null);
+                refreshLogic.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
                 ConfigManager.LoadConfiguration(result, "Automation", VisualStudioActions);
             }

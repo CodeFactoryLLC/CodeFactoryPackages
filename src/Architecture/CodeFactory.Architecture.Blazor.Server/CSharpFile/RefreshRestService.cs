@@ -1,4 +1,5 @@
 ﻿using CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json;
+using CodeFactory.Automation.Standard.Logic;
 using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.SolutionExplorer;
@@ -11,8 +12,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
-namespace CodeFactory.Architecture.AspNetCore.Service.Rest
+namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 {
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
@@ -67,25 +69,51 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
         /// </summary>
         public static string ModelFolder = "ModelFolder";
 
-        ///// <summary>
-        ///// The target project that the abstraction logic will be hosted.
-        ///// </summary>
-        //public static string AbstractionProject = "AbstractionProject";
+        /// <summary>
+        /// The target project that the abstraction logic will be hosted.
+        /// </summary>
+        public static string AbstractionProject = "AbstractionProject";
 
-        ///// <summary>
-        ///// The target folder where abstraction logic will be hosted, this is optional.
-        ///// </summary>
-        //public static string AbstractionFolder = "AbstractionFolder";
+        /// <summary>
+        /// The target folder where abstraction logic will be hosted, this is optional.
+        /// </summary>
+        public static string AbstractionFolder = "AbstractionFolder";
 
-        ///// <summary>
-        ///// The target project where abstraction contracts will be created.
-        ///// </summary>
-        //public static string ContractProject = "ContractProject";
+        /// <summary>
+        /// The target project where abstraction contracts will be created.
+        /// </summary>
+        public static string ContractProject = "ContractProject";
 
-        ///// <summary>
-        ///// The target folder where abstraction contracts will be created, this is optional
-        ///// </summary>
-        //public static string ContractFolder = "ContractFolder";
+        /// <summary>
+        /// The target folder where abstraction contracts will be created, this is optional
+        /// </summary>
+        public static string ContractFolder = "ContractFolder";
+
+        /// <summary>
+        /// Comma seperated list of prefixes to remove from the logc contract when creating the service name.
+        /// </summary>
+        public static string ServiceNameRemovePrefixes = "ServiceNameRemovePrefixes";
+
+        /// <summary>
+        /// Comma sperated list of suffixes to remove from the logic contract when creating the service name.
+        /// </summary>
+        public static string ServiceNameRemoveSuffixes = "ServiceNameRemoveSuffixes";
+
+        /// <summary>
+        /// Prefix to start the service name with.
+        /// </summary>
+        public static string ServiceNameAppendPrefix = "ServiceNameAppendPrefix";
+        
+        /// <summary>
+        /// Prefix to start the service client name with.
+        /// </summary>
+        public static string ServiceClientNameAppendPrefix = "ServiceClientNameAppendPrefix";
+
+        /// <summary>
+        /// Suffix to append to the service client name. 
+        /// </summary>
+        public static string ServiceClientNameAppendSuffix = "ServiceClientNameAppendSuffix";
+        
 
         /// <summary>
         /// Loads the external configuration definition for this command.
@@ -103,7 +131,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
                         Guidance = "Enter the fully project name for the logic contracts project."
                     }
                         .AddFolder
-            (
+                        (
                             new ConfigFolder
                             {
                                 Name = ExecutionFolder,
@@ -112,6 +140,49 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
                                     "Optional, set the relative path from the root of the project. If it is more then one directory deep then use forward slash instead of back slashes."
                             }
                         )
+                        .AddParameter
+                        (
+                            new ConfigParameter
+                            { 
+                                Name = ServiceNameRemovePrefixes,
+                                Guidance = "Optional, provide a comma seperated value of each prefix to check for to be removed from the logic contract name when creating a service name."
+                            }
+                        )
+                        .AddParameter
+                        (
+                            new ConfigParameter
+                            { 
+                                Name = ServiceNameRemoveSuffixes,
+                                Guidance = "Optional, provide a comma seperated value of each suffix to check for to be removed from the logic contract name when creating a service name.",
+                                Value = "Logic"
+                            }
+                        )
+                        .AddParameter
+                        (
+                            new ConfigParameter
+                            { 
+                                Name = ServiceNameAppendPrefix,
+                                Guidance = "Optional, provide the prefix to append to the service name."
+                            }
+                        )
+                        .AddParameter
+                        (
+                            new ConfigParameter
+                            { 
+                                Name = ServiceClientNameAppendPrefix,
+                                Guidance = "Optional, provide the prefix to append to the service client name."
+                            }
+                        )
+                        .AddParameter
+                        (
+                            new ConfigParameter
+                            { 
+                                Name = ServiceClientNameAppendSuffix,
+                                Guidance = "Optional, provide the suffix to append to the service client name.",
+                                Value = "Client"
+                            }
+                        )
+
                 )
                 .AddProject
                 (
@@ -149,6 +220,44 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
                                 Required = false,
                                 Guidance =
                                     "Optional, set the relative path from the root of the project. If it is more then one directory deep then use forward slash instead of back slashes."
+                            }
+                        )
+                )
+                .AddProject
+                (
+                    new ConfigProject
+                    {
+                        Name = AbstractionProject,
+                        Guidance =
+                                "Enter the full project name for the project that hosts the abstraction implementation of the service."
+                    }
+                        .AddFolder
+                        (
+                            new ConfigFolder
+                            {
+                                Name = AbstractionFolder,
+                                Required = false,
+                                Guidance =
+                                    "Optional, set the relative path from the root of the project. If it is more then one directory deep then use forward slah instead of back slashes."
+                            }
+                        )
+                )
+                .AddProject
+                (
+                    new ConfigProject
+                    {
+                        Name = ContractProject,
+                        Guidance =
+                                "Enter the full project name for the project that hosts interface contracts for the abstraction implementation."
+                    }
+                        .AddFolder
+                        (
+                            new ConfigFolder
+                            {
+                                Name = ContractFolder,
+                                Required = false,
+                                Guidance =
+                                    "Optional, set the relative path from the root of the project. If it is more then one directory deep then use '/' instead of back slashes."
                             }
                         )
                 );
@@ -217,11 +326,51 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest
                 var modelFolder =
                     await VisualStudioActions.GetProjectFolderFromConfigAsync(command.Project(ModelProject), ModelFolder);
 
+                var abstractionProject =
+                    await VisualStudioActions.GetProjectFromConfigAsync(command.Project(AbstractionProject))
+                    ?? throw new CodeFactoryException("Cannot load the abstraction project, cannot refresh the service.");
 
-                var serviceClass = await VisualStudioActions.RefreshJsonRestService(logicContract, serviceProject, serviceFolder,
-                    modelProject,modelFolder);
+                var abstractionFolder =
+                    await VisualStudioActions.GetProjectFolderFromConfigAsync(command.Project(AbstractionProject), AbstractionFolder);
+
+                var contractProject =
+                    await VisualStudioActions.GetProjectFromConfigAsync(command.Project(ContractProject))
+                    ?? throw new CodeFactoryException("Cannot load the abstraction contract project, cannot refresh the service.");
+
+                var contractFolder =
+                    await VisualStudioActions.GetProjectFolderFromConfigAsync(command.Project(ContractProject), ContractFolder);
+
+                //Execution command parameters.
+                var serviceNameRemovePrefixes = command.ExecutionProject.ParameterValue(ServiceNameRemovePrefixes);
+                var serviceNameRemoveSuffixes = command.ExecutionProject.ParameterValue(ServiceNameRemoveSuffixes);
+                var serviceNameAppendPrefix = command.ExecutionProject.ParameterValue(ServiceNameAppendPrefix);
+                var serviceClientNameAppendPrefix = command.ExecutionProject.ParameterValue(ServiceClientNameAppendPrefix);
+                var serviceClientNameAppendSuffix = command.ExecutionProject.ParameterValue(ServiceClientNameAppendSuffix);
 
 
+                var serviceNameManagement = NameManagement.Init(serviceNameRemovePrefixes,serviceNameRemoveSuffixes,serviceNameAppendPrefix,null);
+
+                var serviceName = serviceNameManagement.FormatName(logicContract.Name.GenerateCSharpFormattedClassName());
+
+                var serviceClass = await VisualStudioActions.RefreshJsonRestService(serviceName,logicContract, serviceProject, serviceFolder,
+                    modelProject,modelFolder)
+                    ?? throw new CodeFactoryException("Could not refresh the rest json service, cannot refresh the abstraction implementation.");
+
+
+                var serviceClientNameManagement = NameManagement.Init(serviceNameRemovePrefixes,serviceNameRemoveSuffixes,serviceClientNameAppendPrefix,serviceClientNameAppendSuffix);
+
+                var serviceClientName = serviceClientNameManagement.FormatName(logicContract.Name.GenerateCSharpFormattedClassName());
+
+                var abstractionContract = await VisualStudioActions.RefreshCSharpAbstractionContractAsync($"I{serviceClientName}", logicContract, contractProject, contractFolder)
+                    ?? throw new CodeFactoryException("Could not refresh the abstraction contract. The abstraction cannot be updated.");
+
+                var abstractionClass = await VisualStudioActions.RefreshAbstractionClass(serviceClientName, serviceClass,abstractionContract,serviceProject,abstractionProject,modelProject,abstractionFolder,modelFolder);
+
+
+            }
+            catch(CodeFactoryException cfException)
+            { 
+                MessageBox.Show(cfException.Message, "Automation Error", MessageBoxButton.OK, MessageBoxImage.Error);    
             }
             catch (Exception unhandledError)
             {

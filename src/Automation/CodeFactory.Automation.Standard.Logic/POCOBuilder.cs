@@ -80,6 +80,7 @@ namespace CodeFactory.Automation.Standard.Logic
                     throw new CodeFactoryException($"Could not create the POCO for the entity '{pocoName}'");
             }
 
+            
             return await source.UpdatePOCOAsync(sourceClass, pocoProject, pocoSource, defaultNamespaces,nameManagement, pocoFolder,
                 pocoSummary, convertNullableTypes, mappedNamespaces);
 

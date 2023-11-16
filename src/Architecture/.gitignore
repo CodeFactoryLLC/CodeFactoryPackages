@@ -262,9 +262,9 @@ ServiceFabricBackup/
 *.rptproj.bak
 
 # SQL Server files
-#*.mdf
-#*.ldf
-#*.ndf
+*.mdf
+*.ldf
+*.ndf
 
 # Business Intelligence projects
 *.rdl.data
@@ -396,3 +396,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# CodeFactory Working Directories
+**/[Cc]ode[Ff]actory/*

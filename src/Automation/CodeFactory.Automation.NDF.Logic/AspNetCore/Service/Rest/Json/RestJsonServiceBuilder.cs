@@ -11,18 +11,33 @@ using CodeFactory.Automation.Standard.Logic;
 
 namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
 {
-/// <summary>
+    /// <summary>
     /// Automation logic for creating and updated web api rest based services.
     /// </summary>
     public static class RestJsonServiceBUilder
     {
+        /// <summary>
+        /// Refreshes a rest json service implementation.
+        /// </summary>
+        /// <param name="source">CodeFactory Automation SDK.</param>
+        /// <param name="serviceName">The name of the service without the controller suffix appended to it.</param>
+        /// <param name="logicContract">The interface contract for the logic implementation to be supported.</param>
+        /// <param name="serviceProject">The project the service is hosted in.</param>
+        /// <param name="serviceFolder">The service folder the service controller will be created in.</param>
+        /// <param name="modelProject">The project that hosts the rest service models.</param>
+        /// <param name="modelFolder">Optional parameter, provides the folder the model should be located in. Default value is null.</param>
+        /// <returns>The implemented service class.</returns>
+        /// <exception cref="CodeFactoryException">Raised if required information is missing for logic operations could not complete.</exception>
 
-        public static async Task<CsClass> RefreshJsonRestService(this IVsActions source, CsInterface logicContract,
+        public static async Task<CsClass> RefreshJsonRestService(this IVsActions source, string serviceName, CsInterface logicContract,
             VsProject serviceProject, VsProjectFolder serviceFolder, VsProject modelProject,
             VsProjectFolder modelFolder = null)
         {
             if (source == null)
                 throw new CodeFactoryException("CodeFactory automation was not provided cannot refresh the service.");
+
+            if (string.IsNullOrEmpty(serviceName))
+                throw new CodeFactoryException("The service name was not provided cannot refresh the service.");
 
             if (logicContract == null)
                 throw new CodeFactoryException("Cannot load the logic contract, cannot refresh the service.");
@@ -47,10 +62,10 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
             await source.AddSupportRestClassesAsync(modelProject);
             await source.AddJsonServiceExtensionsAsync(serviceProject);
 
-            var serviceName = $"{logicContract.Name.GenerateCSharpFormattedClassName()}Controller";
+            var serviceFormattedName = $"{serviceName}Controller";
 
-            CsSource serviceSource = (await serviceFolder.FindCSharpSourceByClassNameAsync(serviceName))?.SourceCode
-                                     ?? await source.CreateJsonRestServiceAsync(logicContract, serviceProject, serviceFolder);
+            CsSource serviceSource = (await serviceFolder.FindCSharpSourceByClassNameAsync(serviceFormattedName))?.SourceCode
+                                     ?? await source.CreateJsonRestServiceAsync(serviceName,logicContract, serviceProject, serviceFolder);
 
             var serviceClass = await source.UpdateJsonRestServiceAsync(logicContract, serviceSource, serviceProject, serviceFolder,
                 modelProject, modelFolder);
@@ -61,11 +76,24 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
             return serviceClass;
         }
 
-        private static async Task<CsSource> CreateJsonRestServiceAsync(this IVsActions source,
+        /// <summary>
+        /// Creates a new instance of the rest json web api.
+        /// </summary>
+        /// <param name="source">CodeFactory Automation SDK.</param>
+        /// <param name="serviceName">The name of the service without the controller suffix appended to it.</param>
+        /// <param name="logicContract">The interface contract for the logic implementation to be supported.</param>
+        /// <param name="serviceProject">The project the service is hosted in.</param>
+        /// <param name="serviceFolder">The service folder the service controller will be created in.</param>
+        /// <returns>The implemented source code that holds the new definition of the  service.</returns>
+        /// <exception cref="CodeFactoryException">Raised if required information is missing for logic operations could not complete.</exception>
+        private static async Task<CsSource> CreateJsonRestServiceAsync(this IVsActions source, string serviceName,
             CsInterface logicContract, VsProject serviceProject, VsProjectFolder serviceFolder)
         {
             if (source == null)
                 throw new CodeFactoryException("CodeFactory automation was not provided cannot create the service.");
+
+            if (string.IsNullOrEmpty(serviceName))
+                throw new CodeFactoryException("The service name was not provided cannot refresh the service.");
 
             if (logicContract == null)
                 throw new CodeFactoryException("Cannot load the logic contract, cannot create the service.");
@@ -78,8 +106,6 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
 
             var sourceNamespace = await serviceFolder.GetCSharpNamespaceAsync();
             if (string.IsNullOrEmpty(sourceNamespace)) throw new CodeFactoryException("Could not identify the target namespace for the service, service cannot be created.");
-
-            var serviceName = logicContract.Name.GenerateCSharpFormattedClassName();
 
             var sourceFormatter = new SourceFormatter();
 
@@ -141,6 +167,17 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
             return serviceSource;
         }
 
+
+        /// <summary>
+        /// Updates a instance of the rest json web api with the missing members.
+        /// </summary>
+        /// <param name="source">CodeFactory Automation SDK.</param>
+        /// <param name="serviceName">The name of the service without the controller suffix appended to it.</param>
+        /// <param name="logicContract">The interface contract for the logic implementation to be supported.</param>
+        /// <param name="serviceProject">The project the service is hosted in.</param>
+        /// <param name="serviceFolder">The service folder the service controller will be created in.</param>
+        /// <returns>The implemented source code that holds the new definition of the  service.</returns>
+        /// <exception cref="CodeFactoryException">Raised if required information is missing for logic operations could not complete.</exception>
         private static async Task<CsClass> UpdateJsonRestServiceAsync(this IVsActions source,
             CsInterface logicContract, CsSource serviceSource, VsProject serviceProject, VsProjectFolder serviceFolder,
             VsProject modelProject, VsProjectFolder modelFolder = null)

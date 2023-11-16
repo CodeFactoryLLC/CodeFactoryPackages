@@ -21,10 +21,9 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
         /// Creates or updates a repository that uses entity framework for management of data.
         /// </summary>
         /// <param name="source">CodeFactory automation for Visual Studio for Windows.</param>
+        /// <param name="repositoryName">The name of the repository to refresh.</param>
         /// <param name="efEntity">Entity framework entity.</param>
         /// <param name="poco">POCO model that supports the repository.</param>
-        /// <param name="namePrefix">Optional, prefix to assign to the name of the repository, default is null.</param>
-        /// <param name="nameSuffix">Optional, suffix to assign to the name of the repository, default is null.</param>
         /// <param name="contractProject">Project the contract will be added to.</param>
         /// <param name="contractFolder">Optional, project folder contracts will be stored in, default is null.</param>
         /// <param name="additionalContractNamespaces">Optional, additional namespaces to add to the contract definition, default is null.</param>
@@ -38,14 +37,17 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
         /// <param name="additionRepositoryNamespaces">Optional, list of additional namespaces to update the repository with.</param>
         /// <returns>Created or updated repository.</returns>
         /// <exception cref="CodeFactoryException">Raised if required data to create or update the repository is missing.</exception>
-        public static async Task<CsClass> RefreshEFRepositoryAsync(this IVsActions source, CsClass efEntity, VsProject repoProject, 
+        public static async Task<CsClass> RefreshEFRepositoryAsync(this IVsActions source, string repositoryName, CsClass efEntity, VsProject repoProject, 
             VsProject contractProject, CsClass poco, CsClass contextClass, bool useNDF = true,bool supportLogging = true, VsProjectFolder repoFolder = null, VsProjectFolder contractFolder = null,
-            string namePrefix = null, string nameSuffix = null,List<ManualUsingStatementNamespace> additionRepositoryNamespaces = null,
+            List<ManualUsingStatementNamespace> additionRepositoryNamespaces = null,
             List<ManualUsingStatementNamespace> additionalContractNamespaces = null,string loggerFieldName = "_logger", LogLevel logLevel = LogLevel.Information)
         {
 
             if (source == null)
                 throw new CodeFactoryException("CodeFactory automation was not provided, cannot refresh the EF repository.");
+
+            if(string.IsNullOrEmpty(repositoryName))
+                throw new CodeFactoryException("The repository name was not provided, cannot create the repository.");
 
             if (efEntity == null)
                 throw new CodeFactoryException("The entity framework model was not provided, cannot refresh the EF repository.");
@@ -61,45 +63,54 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             if (contextClass == null)
                 throw new CodeFactoryException("The entity framework data context class was not provided, cannot refresh the EF repository.");
 
-            var contractName = $"I{namePrefix}{efEntity.Name}{nameSuffix}";
+            var contractName = $"I{repositoryName}";
 
             CsInterface contractInterface = contractFolder != null ? (await contractFolder.FindCSharpSourceByInterfaceNameAsync(contractName))?.SourceCode?.Interfaces?.FirstOrDefault() 
                 : (await contractProject.FindCSharpSourceByInterfaceNameAsync(contractName))?.SourceCode?.Interfaces?.FirstOrDefault();
 
             if (contractInterface == null)
-                contractInterface = (await source.CreateRepositoryContractAsync(efEntity, contractProject, poco,
-                    contractFolder, namePrefix, nameSuffix, additionalContractNamespaces)) ?? throw new CodeFactoryException("Could not create a repos");
+                contractInterface = (await source.CreateRepositoryContractAsync(contractName, efEntity, contractProject, poco,
+                    contractFolder, additionalContractNamespaces)) ?? throw new CodeFactoryException("Could not create a repos");
 
-            var repoName = $"{namePrefix}{efEntity.Name}{nameSuffix}";
+            var repoName = repositoryName;
 
-            CsSource repoSource = (repoFolder != null
+            CsSource repoSource = repoFolder != null
                 ? (await repoFolder.FindCSharpSourceByClassNameAsync(repoName))?.SourceCode
-                : (await repoProject.FindCSharpSourceByClassNameAsync(repoName))?.SourceCode) 
-                ?? (await source.CreateEFRepositoryAsync(efEntity, repoProject, contractInterface, poco,
-                    contextClass, useNDF, supportLogging, repoFolder, namePrefix, nameSuffix,
-                    additionRepositoryNamespaces)
-                ?? throw new CodeFactoryException($"Could not create the repository '{repoName}'."));
+                : (await repoProject.FindCSharpSourceByClassNameAsync(repoName))?.SourceCode;
 
-            return await source.UpdateEFRepositoryAsync(efEntity, repoProject, repoSource, contractInterface, poco,
+            bool newRepo = false;
+
+            if(repoSource == null)
+            {
+                newRepo = true;
+                repoSource = await source.CreateEFRepositoryAsync(repositoryName, efEntity, repoProject, contractInterface, poco,
+                    contextClass, useNDF, supportLogging, repoFolder,additionRepositoryNamespaces)
+                ?? throw new CodeFactoryException($"Could not create the repository '{repoName}'.");
+            }
+             
+
+            var repoClass =  await source.UpdateEFRepositoryAsync(efEntity, repoProject, repoSource, contractInterface, poco,
                 contextClass, useNDF, supportLogging, repoFolder, additionRepositoryNamespaces);
+
+            if(newRepo) await source.RegisterTransientClassesAsync(repoProject,false);
+
+            return repoClass;
         }
 
         /// <summary>
         /// Create the repositories interface contract.
         /// </summary>
         /// <param name="source">CodeFactory automation for Visual Studio for Windows.</param>
+        /// <param name="contractName">The name of the contract to be created.</param>
         /// <param name="efEntity">Entity framework entity.</param>
         /// <param name="poco">POCO model that supports the repository.</param>
-        /// <param name="namePrefix">Optional, prefix to assign to the name of the repository, default is null.</param>
-        /// <param name="nameSuffix">Optional, suffix to assign to the name of the repository, default is null.</param>
         /// <param name="contractProject">Project the contract will be added to.</param>
         /// <param name="contractFolder">Optional, project folder contracts will be stored in, default is null.</param>
         /// <param name="additionalContractNamespaces">Optional, additional namespaces to add to the contract definition, default is null.</param>
         /// <returns>Contract interface definition</returns>
         /// <exception cref="CodeFactoryException">Raised if required data is missing to create the interface.</exception>
-        private static async Task<CsInterface> CreateRepositoryContractAsync(this IVsActions source, CsClass efEntity, VsProject contractProject, 
-        CsClass poco, VsProjectFolder contractFolder = null, string namePrefix = null, string nameSuffix = null, 
-        List<ManualUsingStatementNamespace> additionalContractNamespaces = null)
+        private static async Task<CsInterface> CreateRepositoryContractAsync(this IVsActions source, string contractName, CsClass efEntity, VsProject contractProject, 
+        CsClass poco, VsProjectFolder contractFolder = null,List<ManualUsingStatementNamespace> additionalContractNamespaces = null)
         {
             if (source == null)
                 throw new CodeFactoryException("CodeFactory automation was not provided, cannot create the repository contract.");
@@ -117,8 +128,6 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             string defaultNamespace = contractFolder != null
                 ? await contractFolder.GetCSharpNamespaceAsync()
                 : contractProject.DefaultNamespace;
-
-            string contractName = $"I{namePrefix}{efEntity.Name}{nameSuffix}";
 
             SourceFormatter contractFormatter = new SourceFormatter();
 
@@ -191,12 +200,15 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
         /// <param name="nameSuffix">Optional, suffix to assign to the name of the repository, default is null.</param>
         /// <returns>Source for the created repository.</returns>
         /// <exception cref="CodeFactoryException">Raised if required data is missing to create the repository.</exception>
-        private static async Task<CsSource> CreateEFRepositoryAsync(this IVsActions source, CsClass efEntity, VsProject repoProject,
+        private static async Task<CsSource> CreateEFRepositoryAsync(this IVsActions source, string repositoryName, CsClass efEntity, VsProject repoProject,
             CsInterface repoContract, CsClass poco, CsClass contextClass, bool useNDF = true, bool supportLogging = true, VsProjectFolder repoFolder = null,
-            string namePrefix = null, string nameSuffix = null, List<ManualUsingStatementNamespace> additionRepositoryNamespaces = null, string loggerFieldName = "_logger")
+            List<ManualUsingStatementNamespace> additionRepositoryNamespaces = null, string loggerFieldName = "_logger")
         {
             if (source == null)
                 throw new CodeFactoryException("CodeFactory automation was not provided, cannot create the repository.");
+
+            if(string.IsNullOrEmpty(repositoryName))
+                throw new CodeFactoryException("The repository name was not provided, cannot create the repository.");
 
             if (efEntity == null)
                 throw new CodeFactoryException("The entity framework model was not provided, cannot create the repository.");
@@ -217,7 +229,7 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
                 ? await repoFolder.GetCSharpNamespaceAsync()
                 : repoProject.DefaultNamespace;
 
-            string repoName = $"{namePrefix}{efEntity.Name}{nameSuffix}";
+            string repoName = repositoryName;
 
             SourceFormatter repoFormatter = new SourceFormatter();
 

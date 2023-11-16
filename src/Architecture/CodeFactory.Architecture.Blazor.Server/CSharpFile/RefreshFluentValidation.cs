@@ -12,8 +12,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
-namespace CodeFactory.Architecture.Blazor.Server
+namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 {
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
@@ -168,11 +169,18 @@ namespace CodeFactory.Architecture.Blazor.Server
 
                 var validatorSuffix = command.ExecutionProject.ParameterValue(ModelValidatorSuffix);
 
+                string removePrefixes = null;
+                string removeSuffixes = null;
+
                 NameManagement nameManagement = null;
 
-                if(!string.IsNullOrEmpty(validatorPrefix) | !string.IsNullOrEmpty(validatorSuffix)) nameManagement = NameManagement.Init(null,null, validatorPrefix, validatorSuffix);
+                if(!string.IsNullOrEmpty(validatorPrefix) | !string.IsNullOrEmpty(validatorSuffix)) nameManagement = NameManagement.Init(removePrefixes,removeSuffixes, validatorPrefix, validatorSuffix);
 
                 var validationClass = VisualStudioActions.RefreshValidationAsync(sourceClass, sourceProject,sourceFolder,nameManagement);
+            }
+            catch (CodeFactoryException codeFactoryError)
+            {
+                MessageBox.Show(codeFactoryError.Message, "Automation Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception unhandledError)
             {

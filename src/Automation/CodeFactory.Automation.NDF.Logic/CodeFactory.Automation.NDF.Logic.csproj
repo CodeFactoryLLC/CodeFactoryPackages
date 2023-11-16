@@ -69,6 +69,9 @@
     <Compile Include="Data\Sql\EF\RepositoryBuilder.cs" />
     <Compile Include="Data\Sql\EF\TryBlockRepositoryEF.cs" />
     <Compile Include="DependencyInjectionBuilder.cs" />
+    <Compile Include="General\FluentValidationBuilder.cs" />
+    <Compile Include="General\LogicBuilder.cs" />
+    <Compile Include="General\ModelBuilder.cs" />
     <Compile Include="LoggerBlockNDFLogger.cs" />
     <Compile Include="ProjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

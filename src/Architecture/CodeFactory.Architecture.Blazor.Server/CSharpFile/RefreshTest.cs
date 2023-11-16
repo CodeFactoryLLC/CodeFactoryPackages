@@ -1,4 +1,5 @@
 ﻿using CodeFactory.Automation.NDF.Logic.Testing.MSTest;
+using CodeFactory.Automation.Standard.Logic;
 using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.SolutionExplorer;
@@ -11,8 +12,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
-namespace CodeFactory.Architecture.Blazor.Server
+namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 {
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
@@ -48,6 +50,17 @@ namespace CodeFactory.Architecture.Blazor.Server
         public static string TestProject = "TestProject";
 
         /// <summary>
+        /// Prefix to append to the name of the integration test being created.
+        /// </summary>
+        public static string TestPrefix = "TestPrefix";
+
+        /// <summary>
+        /// Suffix to append to the name of the integration test being created.
+        /// </summary>
+        public static string TestSuffix = "TestSuffix";
+
+
+        /// <summary>
         /// Loads the external configuration definition for this command.
         /// </summary>
         /// <returns>Will return the command configuration or null if this command does not support external configurations.</returns>
@@ -60,14 +73,32 @@ namespace CodeFactory.Architecture.Blazor.Server
                 Guidance="Automation command that generates integration tests from a provided interface." 
             }
             .UpdateExecutionProject
-                (
+            (
                     new ConfigProject { Name = ExecutionProject, Guidance = "Enter the name of the project the command will trigger from." }
-                )
+            )
                 
             .AddProject
-                (
+            (
                     new ConfigProject { Name = TestProject, Guidance = "Enter the name of the project that hosts the MSTest integration testings." }
-                );
+            )
+            .AddParameter
+            (
+                new ConfigParameter
+                { 
+                    Name = TestPrefix,
+                    Guidance = "Optional, prefix to append to the name of the integration test when being created."
+                }
+            )
+            .AddParameter
+            (
+                new ConfigParameter
+                { 
+                    Name = TestSuffix,
+                    Guidance = "Optional, Suffix to append to the name of the integration test when being created.",
+                    Value = "Test"
+
+                }
+            );
 
             return config;
         }
@@ -129,12 +160,26 @@ namespace CodeFactory.Architecture.Blazor.Server
                 var testProject = (await VisualStudioActions.GetProjectFromConfigAsync(config.Project(TestProject))) 
                     ?? throw new CodeFactoryException("Could not locate the test project cannot refresh the test.");
 
+                
+
                 var targetInterface = result.SourceCode?.Interfaces?.FirstOrDefault()
                     ?? throw new CodeFactoryException("Could not locate the interface to have tests created from.");
 
-                var test = VisualStudioActions.RefreshMSTestIntegrationTestAsync(targetInterface, testProject);
+                var testPrefix = config.Project(TestProject).ParameterValue(TestPrefix);
+                var testSuffix = config.Project(TestProject).ParameterValue(TestSuffix);
+
+                string noRemove = null;
+
+                var testName = NameManagement.Init(noRemove,noRemove,testPrefix,testSuffix).FormatName(targetInterface.Name.GenerateCSharpFormattedClassName());
 
 
+                var test = VisualStudioActions.RefreshMSTestIntegrationTestAsync(testName,targetInterface, testProject);
+
+
+            }
+            catch (CodeFactoryException codeFactoryError)
+            {
+                MessageBox.Show(codeFactoryError.Message, "Automation Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception unhandledError)
             {
