@@ -34,7 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CodeFactory.WinVs.SDK" Version="2.23160.1-PreRelease" />
+    <PackageReference Include="CodeFactory.WinVs.SDK" Version="2.24015.2-PreRelease" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

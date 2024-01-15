@@ -36,4 +36,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: AssemblyCFEnvironment("CFVSW")]
-[assembly: AssemblyCFSdkVersion("2.23160.0.1")]
+[assembly: AssemblyCFSdkVersion("2.24015.0.2")]
