@@ -1,20 +1,18 @@
-﻿using CodeFactory.WinVs.Models.CSharp.Builder;
-using CodeFactory.WinVs.Models.CSharp;
-using CodeFactory.WinVs.Models.ProjectSystem;
+﻿using CodeFactory.Automation.Standard.Logic.Extensions;
 using CodeFactory.WinVs;
-using System;
-using System.Collections.Generic;
+using CodeFactory.WinVs.Models.CSharp;
+using CodeFactory.WinVs.Models.CSharp.Builder;
+using CodeFactory.WinVs.Models.ProjectSystem;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CodeFactory.Automation.Standard.Logic;
 
 namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
 {
-    /// <summary>
-    /// Automation logic for creating and updated web api rest based services.
-    /// </summary>
-    public static class RestJsonServiceBUilder
+	/// <summary>
+	/// Automation logic for creating and updated web api rest based services.
+	/// </summary>
+	public static class RestJsonServiceBUilder
     {
         /// <summary>
         /// Refreshes a rest json service implementation.
@@ -316,7 +314,7 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
                 {
                     logicFormatter.AppendCodeLine(3, logicReturnType.IsValueType
                             ? $"{logicReturnType.GenerateCSharpTypeName(serviceManager.NamespaceManager, serviceManager.MappedNamespaces)} result;"
-                            : $"{logicReturnType.GenerateCSharpTypeName(serviceManager.NamespaceManager, serviceManager.MappedNamespaces)} result = null;");
+                            : $"{logicReturnType.GenerateCSharpTypeName(serviceManager.NamespaceManager, serviceManager.MappedNamespaces)}? result = null;");
                 }
 
                 logicFormatter.AppendCodeLine(3, "try");

@@ -50,18 +50,27 @@
   <ItemGroup>
     <Compile Include="AddClassMissingMemberBuilder.cs" />
     <Compile Include="CloneInterfaceBuilder.cs" />
-    <Compile Include="CsClassExtensions.cs" />
-    <Compile Include="CsInterfaceExtensions.cs" />
+    <Compile Include="Enums\UIFrameworkEnum.cs" />
+    <Compile Include="Extensions\CsClassExtensions.cs" />
+    <Compile Include="Extensions\CsInterfaceExtensions.cs" />
+    <Compile Include="Extensions\CsMethodExtensions.cs" />
+    <Compile Include="Extensions\CsTypeExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Extensions\VsDocumentExtensions.cs" />
+    <Compile Include="Extensions\VsModelExtensions.cs" />
+    <Compile Include="Extensions\VsSolutionExtensions.cs" />
+    <Compile Include="Extensions\VsProjectFolderExtensions.cs" />
     <Compile Include="FluentValidation\FluentValidationBuilder.cs" />
     <Compile Include="MethodBuilderInterface.cs" />
     <Compile Include="NameManagement.cs" />
-    <Compile Include="NameManagementExtensions.cs" />
+    <Compile Include="Extensions\NameManagementExtensions.cs" />
     <Compile Include="POCOBuilder.cs" />
-    <Compile Include="ProjectExtensions.cs" />
+    <Compile Include="Extensions\VsProjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyBuilderTransformNullabeTypes.cs" />
-    <Compile Include="SourceManagerExtensions.cs" />
+    <Compile Include="Extensions\SourceManagerExtensions.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

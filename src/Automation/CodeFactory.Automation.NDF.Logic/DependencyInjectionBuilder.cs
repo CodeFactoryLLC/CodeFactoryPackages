@@ -1,22 +1,22 @@
-﻿using CodeFactory.WinVs.Logging;
-using CodeFactory.WinVs.Models.CSharp.Builder;
-using CodeFactory.WinVs.Models.CSharp;
-using CodeFactory.WinVs.Models.ProjectSystem;
+﻿using CodeFactory.Automation.Standard.Logic.Extensions;
 using CodeFactory.WinVs;
+using CodeFactory.WinVs.Logging;
+using CodeFactory.WinVs.Models.CSharp;
+using CodeFactory.WinVs.Models.CSharp.Builder;
+using CodeFactory.WinVs.Models.ProjectSystem;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CodeFactory.Automation.Standard.Logic;
 
 namespace CodeFactory.Automation.NDF.Logic
 {
-    /// <summary>
-    /// Automation class that will manage creation of dependency injection transient code in libraries that support NDF.
-    /// </summary>
-    public static class DependencyInjectionBuilder
+	/// <summary>
+	/// Automation class that will manage creation of dependency injection transient code in libraries that support NDF.
+	/// </summary>
+	public static class DependencyInjectionBuilder
     {
         //Logger used for code factory logging
         // ReSharper disable once InconsistentNaming

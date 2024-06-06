@@ -2,29 +2,24 @@
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.SolutionExplorer;
 using CodeFactory.WinVs.Logging;
-using CodeFactory.WinVs.Models.CSharp;
-using CodeFactory.WinVs.Models.CSharp.Builder;
 using CodeFactory.WinVs.Models.ProjectSystem;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace CodeFactory.Architecture.AspNetCore.Service.Rest.Solution
 {
-/// <summary>
-    /// Code factory command for automation of the solution when selected from solution explorer.
-    /// </summary>
-    public class ReloadAutomationConfiguration : SolutionCommandBase
+	/// <summary>
+	/// Code factory command for automation of the solution when selected from solution explorer.
+	/// </summary>
+	public class CreateAutomationConfigurationCommand : SolutionCommandBase
     {
-        private static readonly string commandTitle = "Reload Automation Configuration";
-        private static readonly string commandDescription = "Reloads the automation configuration.";
+        private static readonly string commandTitle = "Create Automation Configuration";
+        private static readonly string commandDescription = "Creates an empty automation configuration.";
 
 #pragma warning disable CS1998
         /// <inheritdoc />
-        public ReloadAutomationConfiguration(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public CreateAutomationConfigurationCommand(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -34,7 +29,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.Solution
         /// <summary>
         /// The fully qualified name of the command to be used with configuration.
         /// </summary>
-        public static string Type = typeof(ReloadAutomationConfiguration).FullName;
+        public static string Type = typeof(CreateAutomationConfigurationCommand).FullName;
 
         /// <summary>
         /// Loads the external configuration definition for this command.
@@ -60,7 +55,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.Solution
 
             try
             {
-                isEnabled = await ConfigManager.HasAutomationConfigAsync(result, "Automation");
+                isEnabled = !(await ConfigManager.HasAutomationConfigAsync(result, "Automation"));
             }
             catch (Exception unhandledError)
             {
@@ -81,7 +76,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.Solution
 
             try
             {
-                ConfigManager.LoadConfiguration(result, "Automation", VisualStudioActions);
+                await ConfigManager.CreateDefaultConfigurationAsync(result, "AspNetCore WebApi Json Configuration", "Automation");
             }
             catch (CodeFactoryException codeFactoryError)
             {

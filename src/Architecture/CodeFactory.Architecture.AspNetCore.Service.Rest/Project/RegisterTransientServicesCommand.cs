@@ -3,22 +3,17 @@ using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.SolutionExplorer;
 using CodeFactory.WinVs.Logging;
-using CodeFactory.WinVs.Models.CSharp;
-using CodeFactory.WinVs.Models.CSharp.Builder;
 using CodeFactory.WinVs.Models.ProjectSystem;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace CodeFactory.Architecture.AspNetCore.Service.Rest.Project
 {
-/// <summary>
-    /// Code factory command for automation of a project when selected from solution explorer.
-    /// </summary>
-    public class RegisterTransientServices : ProjectCommandBase
+	/// <summary>
+	/// Code factory command for automation of a project when selected from solution explorer.
+	/// </summary>
+	public class RegisterTransientServicesCommand : ProjectCommandBase
     {
         private static readonly string commandTitle = "Register Transient Services";
         private static readonly string commandDescription = "Registers Transient classes with a NDF dependency injection loader for a target project.";
@@ -26,7 +21,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.Project
 #pragma warning disable CS1998
 
         /// <inheritdoc />
-        public RegisterTransientServices(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public RegisterTransientServicesCommand(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -37,7 +32,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.Project
         /// <summary>
         /// The fully qualified name of the command to be used with configuration.
         /// </summary>
-        public static string Type = typeof(RegisterTransientServices).FullName;
+        public static string Type = typeof(RegisterTransientServicesCommand).FullName;
 
         /// <summary>
         /// Loads the external configuration definition for this command.

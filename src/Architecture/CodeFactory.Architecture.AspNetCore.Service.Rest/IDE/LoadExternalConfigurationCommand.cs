@@ -1,30 +1,27 @@
 ﻿using CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile;
+using CodeFactory.Automation.NDF.Logic.Testing.MSTest;
+using CodeFactory.Automation.NDF.Logic.Testing.XUnit;
 using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.IDE;
 using CodeFactory.WinVs.Logging;
-using CodeFactory.WinVs.Models.CSharp;
-using CodeFactory.WinVs.Models.CSharp.Builder;
 using CodeFactory.WinVs.Models.ProjectSystem;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CodeFactory.Architecture.AspNetCore.Service.Rest.IDE
 {
-    /// <summary>
-    /// Code factory command that is executed when the solution is loaded. This command only gets called one time on load of the solution.
-    /// </summary>
-    public class LoadExternalConfiguration : SolutionLoadCommandBase
+	/// <summary>
+	/// Code factory command that is executed when the solution is loaded. This command only gets called one time on load of the solution.
+	/// </summary>
+	public class LoadExternalConfigurationCommand : SolutionLoadCommandBase
     {
         private static readonly string commandTitle = "Load External Configuration";
         private static readonly string commandDescription = "Loads the external configuration for automation.";
 
         #pragma warning disable CS1998
         /// <inheritdoc />
-        public LoadExternalConfiguration(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public LoadExternalConfigurationCommand(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -38,28 +35,42 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.IDE
 
             try
             {
-                var refreshEFRepository = new RefreshEFRepository(null, null);
+                var refreshEFRepository = new RefreshEFRepositoryCommand(null, null);
                 refreshEFRepository.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
-                var refreshRestService = new RefreshRestService(null, null);
+                var refreshRestService = new RefreshRestServiceCommand(null, null);
                 refreshRestService.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
-                var refreshTest = new RefreshTest(null, null);
-                refreshTest.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
+				// Load configuration based on what type of test project you have loaded                
+				var projects = await result.GetProjectsAsync(false);
+				foreach (var project in projects)
+				{
+					if (await project.TestProjectIsConfiguredMSTestAsync())
+					{
+						var RefreshMSTestCommand = new RefreshMSTestCommand(null, null);
+						RefreshMSTestCommand.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
+					}
 
-                var refreshFluentValidation = new RefreshFluentValidation(null, null);
+					if (await project.TestProjectIsConfiguredXUnitAsync())
+					{
+						var RefreshXUnitTestCommand = new RefreshXUnitTestCommand(null, null);
+						RefreshXUnitTestCommand.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
+					}
+				}
+
+				var refreshFluentValidation = new RefreshFluentValidationCommand(null, null);
                 refreshFluentValidation.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
-                var addMissingRepositoryMembers = new AddMissingRepositoryMembers(null, null);
+                var addMissingRepositoryMembers = new AddMissingRepositoryMembersCommand(null, null);
                 addMissingRepositoryMembers.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
-                var updateLogicImplementation = new UpdateLogicImplementation(null, null);
+                var updateLogicImplementation = new UpdateLogicImplementationCommand(null, null);
                 updateLogicImplementation.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
-                var addMissingLogicMembers = new AddMissingLogicMembers(null, null);
+                var addMissingLogicMembers = new AddMissingLogicMembersCommand(null, null);
                 addMissingLogicMembers.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
-                var refreshLogic = new RefreshLogic(null, null);
+                var refreshLogic = new RefreshLogicCommand(null, null);
                 refreshLogic.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
                 ConfigManager.LoadConfiguration(result, "Automation", VisualStudioActions);

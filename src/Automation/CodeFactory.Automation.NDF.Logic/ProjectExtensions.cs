@@ -1,16 +1,13 @@
-﻿using CodeFactory.WinVs.Models.ProjectSystem;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using CodeFactory.Automation.Standard.Logic.Extensions;
+using CodeFactory.WinVs.Models.ProjectSystem;
 using System.Threading.Tasks;
-using CodeFactory.Automation.Standard.Logic;
+
 namespace CodeFactory.Automation.NDF.Logic
 {
-    /// <summary>
-    /// Extension methods that support the <see cref="VsProject"/>
-    /// </summary>
-    public static class ProjectExtensions
+	/// <summary>
+	/// Extension methods that support the <see cref="VsProject"/>
+	/// </summary>
+	public static class ProjectExtensions
     {
 
         /// <summary>

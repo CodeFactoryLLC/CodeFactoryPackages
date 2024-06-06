@@ -1,20 +1,19 @@
 ﻿using CodeFactory.Automation.Standard.Logic;
-using CodeFactory.WinVs.Models.CSharp.Builder;
-using CodeFactory.WinVs.Models.CSharp;
-using CodeFactory.WinVs.Models.ProjectSystem;
+using CodeFactory.Automation.Standard.Logic.Extensions;
 using CodeFactory.WinVs;
-using System;
-using System.Collections.Generic;
+using CodeFactory.WinVs.Models.CSharp;
+using CodeFactory.WinVs.Models.CSharp.Builder;
+using CodeFactory.WinVs.Models.ProjectSystem;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
 {
-/// <summary>
-    /// Automation class that generates C# abstraction contracts.
-    /// </summary>
-    public static class RestJsonCSharpAbstractionBuilder
+	/// <summary>
+	/// Automation class that generates C# abstraction contracts.
+	/// </summary>
+	public static class RestJsonCSharpAbstractionBuilder
     {
         /// <summary>
         /// Refreshes the interface definition of an service abstraction client.
@@ -96,8 +95,8 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
             contractFormatter.AppendCodeLine(1, "}");
             contractFormatter.AppendCodeLine(0, "}");
 
-            var doc = contractFolder != null ? await contractFolder.AddDocumentAsync($"{contractName}.cs", contractFormatter.ReturnSource())
-                : await contractProject.AddDocumentAsync($"{contractName}.cs", contractFormatter.ReturnSource());
+            var doc = contractFolder != null ? await contractFolder.AddDocumentAsync($"{contractName}.cs", contractFormatter.ReturnSource().TrimStartEndLines())
+                : await contractProject.AddDocumentAsync($"{contractName}.cs", contractFormatter.ReturnSource().TrimStartEndLines());
 
             return doc == null
                 ? throw new CodeFactoryException($"Failed to create the abstraction contract '{contractName}'.")
@@ -481,7 +480,7 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
                 {
                     contentFormatter.AppendCodeLine(3,
                         logicReturnType.IsClass
-                            ? $"{logicReturnType.GenerateCSharpTypeName(abstractManager.NamespaceManager,abstractManager.MappedNamespaces)} result = null; "
+                            ? $"{logicReturnType.GenerateCSharpTypeName(abstractManager.NamespaceManager,abstractManager.MappedNamespaces)}? result = null; "
                             : $"{logicReturnType.GenerateCSharpTypeName(abstractManager.NamespaceManager, abstractManager.MappedNamespaces)} result;");
                     contentFormatter.AppendCodeLine(3);
                 }
@@ -575,12 +574,12 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
                 contentFormatter.AppendCodeLine(3, "_logger.InformationExitLog();");
                 contentFormatter.AppendCodeLine(3);
 
-                if (returnsData) contentFormatter.AppendCodeLine(3, "return result;");
+                if (returnsData) contentFormatter.AppendCodeLine(3, "return result!;");
 
                 contentFormatter.AppendCodeLine(2, "}");
                 contentFormatter.AppendCodeLine(2);
 
-                await abstractManager.ConstructorsAddAfterAsync(contentFormatter.ReturnSource());
+                await abstractManager.ConstructorsAddAfterAsync(contentFormatter.ReturnSource().TrimEndLines());
 
                 contentFormatter.ResetFormatter();
             }
@@ -711,7 +710,7 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
             sourceFormatter.AppendCodeLine(1, "}");
             sourceFormatter.AppendCodeLine(0, "}");
 
-            await abstractionProject.AddDocumentAsync("RestAbstraction.cs", sourceFormatter.ReturnSource());
+            await abstractionProject.AddDocumentAsync("RestAbstraction.cs", sourceFormatter.ReturnSource().TrimStartEndLines());
         }
 
         private static async Task AddServiceUrlBaseClassAsync(this IVsActions source, VsProject abstractionProject)
@@ -810,8 +809,8 @@ namespace CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json
             sourceFormatter.AppendCodeLine(1, "}");
             sourceFormatter.AppendCodeLine(0, "}");
 
-            if (abstractionFolder != null) await abstractionFolder.AddDocumentAsync($"{className}.cs", sourceFormatter.ReturnSource());
-            else await abstractionProject.AddDocumentAsync($"{className}.cs", sourceFormatter.ReturnSource());
+            if (abstractionFolder != null) await abstractionFolder.AddDocumentAsync($"{className}.cs", sourceFormatter.ReturnSource().TrimEndLines());
+            else await abstractionProject.AddDocumentAsync($"{className}.cs", sourceFormatter.ReturnSource().TrimEndLines());
         }
     }
 }
