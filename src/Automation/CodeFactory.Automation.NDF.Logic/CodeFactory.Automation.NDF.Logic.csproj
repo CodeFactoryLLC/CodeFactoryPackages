@@ -73,9 +73,15 @@
     <Compile Include="General\LogicBuilder.cs" />
     <Compile Include="General\ModelBuilder.cs" />
     <Compile Include="LoggerBlockNDFLogger.cs" />
+    <Compile Include="Node\Angular\LocalModelBuilder.cs" />
+    <Compile Include="Node\Angular\LocalServiceBuilder.cs" />
+    <Compile Include="Node\Angular\TypescriptConverter.cs" />
     <Compile Include="ProjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Testing\BUnit\IntegrationTestBuilder.cs" />
     <Compile Include="Testing\MSTest\IntegrationTestBuilder.cs" />
+    <Compile Include="Testing\NUnit\IntegrationTestBuilder.cs" />
+    <Compile Include="Testing\XUnit\IntegrationTestBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CodeFactory.Automation.Standard.Logic\CodeFactory.Automation.Standard.Logic.csproj">

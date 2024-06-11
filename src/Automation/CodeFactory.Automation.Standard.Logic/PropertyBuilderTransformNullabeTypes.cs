@@ -1,5 +1,6 @@
-﻿using CodeFactory.WinVs.Models.CSharp.Builder;
+﻿using CodeFactory.Automation.Standard.Logic.Extensions;
 using CodeFactory.WinVs.Models.CSharp;
+using CodeFactory.WinVs.Models.CSharp.Builder;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -9,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace CodeFactory.Automation.Standard.Logic
 {
- /// <summary>
-    /// Property builder that generates a property with the property type being able to be transformed from nullable to non nullable types.
-    /// </summary>
-    public class PropertyBuilderTransformNullableTypes : BasePropertyBuilder
+	/// <summary>
+	/// Property builder that generates a property with the property type being able to be transformed from nullable to non nullable types.
+	/// </summary>
+	public class PropertyBuilderTransformNullableTypes : BasePropertyBuilder
     {
         /// <summary>
         /// Determines if the property type will be transformed from nullable to a non nullable type.

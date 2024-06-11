@@ -1,33 +1,31 @@
 ﻿using CodeFactory.Automation.NDF.Logic.Testing.MSTest;
 using CodeFactory.Automation.Standard.Logic;
+using CodeFactory.Automation.Standard.Logic.Extensions;
 using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.SolutionExplorer;
 using CodeFactory.WinVs.Logging;
 using CodeFactory.WinVs.Models.CSharp;
-using CodeFactory.WinVs.Models.CSharp.Builder;
 using CodeFactory.WinVs.Models.ProjectSystem;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 {
-    /// <summary>
-    /// Code factory command for automation of a C# document when selected from a project in solution explorer.
-    /// </summary>
-    public class RefreshTest : CSharpSourceCommandBase
+	/// <summary>
+	/// Code factory command for automation of a C# document when selected from a project in solution explorer.
+	/// </summary>
+	public class RefreshMSTestCommand : CSharpSourceCommandBase
     {
-        private static readonly string commandTitle = "Refresh Test";
-        private static readonly string commandDescription = "Refreshes an integration test from the target interface.";
+        private static readonly string commandTitle = "Refresh MSTest Test";
+        private static readonly string commandDescription = "Refreshes an MSTest integration test from the target interface.";
 
 #pragma warning disable CS1998
 
         /// <inheritdoc />
-        public RefreshTest(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public RefreshMSTestCommand(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -37,7 +35,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
         /// <summary>
         /// The fully qualified name of the command to be used with configuration.
         /// </summary>
-        public static string Type = typeof(RefreshTest).FullName;
+        public static string Type = typeof(RefreshMSTestCommand).FullName;
 
         /// <summary>
         /// Project executing the command
@@ -59,7 +57,6 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
         /// </summary>
         public static string TestSuffix = "TestSuffix";
 
-
         /// <summary>
         /// Loads the external configuration definition for this command.
         /// </summary>
@@ -69,7 +66,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
             var config = new ConfigCommand 
             { 
                 CommandType = Type, Category="Testing",
-                Name=nameof(RefreshTest),
+                Name=nameof(RefreshMSTestCommand),
                 Guidance="Automation command that generates integration tests from a provided interface." 
             }
             .UpdateExecutionProject
@@ -96,7 +93,6 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
                     Name = TestSuffix,
                     Guidance = "Optional, Suffix to append to the name of the integration test when being created.",
                     Value = "Test"
-
                 }
             );
 
@@ -132,7 +128,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 
                         isEnabled = testProject != null;
 
-                        if (isEnabled) isEnabled = await testProject.TestProjectIsConfiguredAsync();
+                        if (isEnabled) isEnabled = await testProject.TestProjectIsConfiguredMSTestAsync();
                     }
                 }
             }
@@ -158,9 +154,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
                     ?? throw new CodeFactoryException("Could not load the commands configuration.");
 
                 var testProject = (await VisualStudioActions.GetProjectFromConfigAsync(config.Project(TestProject))) 
-                    ?? throw new CodeFactoryException("Could not locate the test project cannot refresh the test.");
-
-                
+                    ?? throw new CodeFactoryException("Could not locate the test project cannot refresh the test.");                
 
                 var targetInterface = result.SourceCode?.Interfaces?.FirstOrDefault()
                     ?? throw new CodeFactoryException("Could not locate the interface to have tests created from.");
@@ -172,10 +166,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 
                 var testName = NameManagement.Init(noRemove,noRemove,testPrefix,testSuffix).FormatName(targetInterface.Name.GenerateCSharpFormattedClassName());
 
-
                 var test = VisualStudioActions.RefreshMSTestIntegrationTestAsync(testName,targetInterface, testProject);
-
-
             }
             catch (CodeFactoryException codeFactoryError)
             {
@@ -185,12 +176,8 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
             {
                 _logger.Error($"The following unhandled error occurred while executing the solution explorer C# document command {commandTitle}. ",
                     unhandledError);
-
             }
-
         }
-
         #endregion
     }
-
 }

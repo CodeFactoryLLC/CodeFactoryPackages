@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
-namespace CodeFactory.Automation.Standard.Logic
+namespace CodeFactory.Automation.Standard.Logic.Extensions
 {
-// <summary>
-    /// Extension methods that support the <see cref="NameManagement"/> data class.
-    /// </summary>
-    public static class NameManagementExtensions
+	// <summary>
+	/// Extension methods that support the <see cref="NameManagement"/> data class.
+	/// </summary>
+	public static class NameManagementExtensions
     {
         /// <summary>
         /// Formates an object name using the the name management provided critera.

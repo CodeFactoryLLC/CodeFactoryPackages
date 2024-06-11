@@ -1,16 +1,15 @@
-﻿using CodeFactory.WinVs.Models.ProjectSystem;
-using System;
+﻿using CodeFactory.Document;
+using CodeFactory.WinVs.Models.ProjectSystem;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace CodeFactory.Automation.Standard.Logic
+namespace CodeFactory.Automation.Standard.Logic.Extensions
 {
-    /// <summary>
-    /// Extension methods that support the <see cref="VsProject"/>
-    /// </summary>
-    public static class ProjectExtensions
+	/// <summary>
+	/// Extension methods that support the <see cref="VsProject"/>
+	/// </summary>
+	public static class VsProjectExtensions
     {
         /// <summary>
         /// Library name and root namespace for logging extensions from Microsoft.
@@ -55,5 +54,23 @@ namespace CodeFactory.Automation.Standard.Logic
             return result;
 
         }
-    }
+
+		/// <summary>
+		/// Returns an int representing the number of lines of code within each code file within the source project folder.
+		/// </summary>
+		/// <param name="source">The source VsProject object</param>
+		/// <returns>Returns a count of all children .cshtml or .cs file's lines of code.</returns>
+		public static async Task<int> CountLinesOfCodeAsync(this VsProject source)
+		{
+			int count = 0;
+			IReadOnlyList<VsModel> codeFiles = await source.GetChildrenAsync(true);
+			IEnumerable<VsModel> children = codeFiles.Where(p => p.ModelType.Equals(VisualStudioModelType.Document) && (p.Name.Contains(".cshtml")) || p.Name.Contains(".cs"));
+			foreach (VsDocument codeFile in children)
+			{
+				IDocumentContent content = await codeFile.GetDocumentContentAsContentAsync();
+				count += content.Count;
+			}
+			return count;
+		}
+	}
 }

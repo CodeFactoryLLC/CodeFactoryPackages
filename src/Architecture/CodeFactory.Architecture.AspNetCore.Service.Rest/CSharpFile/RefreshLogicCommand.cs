@@ -1,25 +1,23 @@
 ﻿using CodeFactory.Automation.NDF.Logic.General;
 using CodeFactory.Automation.Standard.Logic;
+using CodeFactory.Automation.Standard.Logic.Extensions;
 using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.SolutionExplorer;
 using CodeFactory.WinVs.Logging;
 using CodeFactory.WinVs.Models.CSharp;
-using CodeFactory.WinVs.Models.CSharp.Builder;
 using CodeFactory.WinVs.Models.ProjectSystem;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 {
-    /// <summary>
-    /// Code factory command for automation of a C# document when selected from a project in solution explorer.
-    /// </summary>
-    public class RefreshLogic : CSharpSourceCommandBase
+	/// <summary>
+	/// Code factory command for automation of a C# document when selected from a project in solution explorer.
+	/// </summary>
+	public class RefreshLogicCommand : CSharpSourceCommandBase
     {
         private static readonly string commandTitle = "Refresh Logic";
         private static readonly string commandDescription = "Refreshes the logic implementation for the target logic interface.";
@@ -27,7 +25,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 #pragma warning disable CS1998
 
         /// <inheritdoc />
-        public RefreshLogic(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public RefreshLogicCommand(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -37,7 +35,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
         /// <summary>
         /// The fully qualified name of the command to be used with configuration.
         /// </summary>
-        public static string Type = typeof(RefreshLogic).FullName;
+        public static string Type = typeof(RefreshLogicCommand).FullName;
 
         /// <summary>
         /// Exection project for the command.

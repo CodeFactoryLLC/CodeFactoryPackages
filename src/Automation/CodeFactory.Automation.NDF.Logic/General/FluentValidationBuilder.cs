@@ -1,19 +1,17 @@
-﻿using CodeFactory.WinVs.Models.CSharp;
-using CodeFactory.WinVs.Models.ProjectSystem;
+﻿using CodeFactory.Automation.Standard.Logic;
+using CodeFactory.Automation.Standard.Logic.Extensions;
 using CodeFactory.WinVs;
-using System;
-using System.Collections.Generic;
+using CodeFactory.WinVs.Models.CSharp;
+using CodeFactory.WinVs.Models.ProjectSystem;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using CodeFactory.Automation.Standard.Logic;
 
 namespace CodeFactory.Automation.NDF.Logic.General
 {
-    /// <summary>
-    /// Automation logic for the creation and update of fluent validation classes.
-    /// </summary>
-    public static class FluentValidationBuilder
+	/// <summary>
+	/// Automation logic for the creation and update of fluent validation classes.
+	/// </summary>
+	public static class FluentValidationBuilder
     {
         /// <summary>
         /// Refreshes the definition of a fluent validation class.

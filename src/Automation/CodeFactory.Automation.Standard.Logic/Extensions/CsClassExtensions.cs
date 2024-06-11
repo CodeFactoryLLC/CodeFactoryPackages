@@ -1,16 +1,13 @@
 ﻿using CodeFactory.WinVs.Models.CSharp;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace CodeFactory.Automation.Standard.Logic
+namespace CodeFactory.Automation.Standard.Logic.Extensions
 {
-    /// <summary>
-    /// Extension methods that suppor the <see cref="CsClass"/> model.
-    /// </summary>
-    public static class CsClassExtensions
+	/// <summary>
+	/// Extension methods that suppor the <see cref="CsClass"/> model.
+	/// </summary>
+	public static class CsClassExtensions
     {
         /// <summary>
         /// Generates the C# type name for the target class.

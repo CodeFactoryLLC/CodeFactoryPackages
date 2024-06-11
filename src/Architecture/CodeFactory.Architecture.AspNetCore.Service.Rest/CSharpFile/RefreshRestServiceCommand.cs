@@ -1,25 +1,23 @@
 ﻿using CodeFactory.Automation.NDF.Logic.AspNetCore.Service.Rest.Json;
 using CodeFactory.Automation.Standard.Logic;
+using CodeFactory.Automation.Standard.Logic.Extensions;
 using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.SolutionExplorer;
 using CodeFactory.WinVs.Logging;
 using CodeFactory.WinVs.Models.CSharp;
-using CodeFactory.WinVs.Models.CSharp.Builder;
 using CodeFactory.WinVs.Models.ProjectSystem;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 {
-    /// <summary>
-    /// Code factory command for automation of a C# document when selected from a project in solution explorer.
-    /// </summary>
-    public class RefreshRestService : CSharpSourceCommandBase
+	/// <summary>
+	/// Code factory command for automation of a C# document when selected from a project in solution explorer.
+	/// </summary>
+	public class RefreshRestServiceCommand : CSharpSourceCommandBase
     {
         private static readonly string commandTitle = "Refresh Rest Service";
         private static readonly string commandDescription = "Refreshes the implementation of a rest service from a contract definition.";
@@ -27,7 +25,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 #pragma warning disable CS1998
 
         /// <inheritdoc />
-        public RefreshRestService(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public RefreshRestServiceCommand(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -37,7 +35,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
         /// <summary>
         /// The name of the command the configuration is tied to.
         /// </summary>
-        public static string Type = typeof(RefreshRestService).FullName;
+        public static string Type = typeof(RefreshRestServiceCommand).FullName;
 
         /// <summary>
         /// The execution project that contains the definition of the logic contract to implement as a service.
@@ -101,7 +99,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
         public override ConfigCommand LoadExternalConfigDefinition()
         {
             var command = new ConfigCommand
-            { Category = "JsonRestService", Name = nameof(RefreshRestService), CommandType = Type }
+            { Category = "JsonRestService", Name = nameof(RefreshRestServiceCommand), CommandType = Type }
                 .UpdateExecutionProject
                 (
                     new ConfigProject

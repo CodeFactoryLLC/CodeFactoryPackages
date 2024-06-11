@@ -1,17 +1,13 @@
-﻿using CodeFactory.WinVs.Models.CSharp.Builder;
-using CodeFactory.WinVs.Models.CSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using CodeFactory.WinVs.Models.CSharp;
+using CodeFactory.WinVs.Models.CSharp.Builder;
 using System.Threading.Tasks;
 
-namespace CodeFactory.Automation.Standard.Logic
+namespace CodeFactory.Automation.Standard.Logic.Extensions
 {
-    /// <summary>
-    /// Extensions methods that support the <see cref="ISourceManager"/> interface.
-    /// </summary>
-    public static class SourceManagerExtensions
+	/// <summary>
+	/// Extensions methods that support the <see cref="ISourceManager"/> interface.
+	/// </summary>
+	public static class SourceManagerExtensions
     {
         /// <summary>
         /// Checks all types definitions and makes sure they are included in the namespace manager for the target update source.

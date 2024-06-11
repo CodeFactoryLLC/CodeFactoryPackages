@@ -1,19 +1,19 @@
-﻿using CodeFactory.WinVs.Models.CSharp.Builder;
-using CodeFactory.WinVs.Models.CSharp;
-using CodeFactory.WinVs.Models.ProjectSystem;
+﻿using CodeFactory.Automation.Standard.Logic.Extensions;
 using CodeFactory.WinVs;
-using System;
+using CodeFactory.WinVs.Models.CSharp;
+using CodeFactory.WinVs.Models.CSharp.Builder;
+using CodeFactory.WinVs.Models.ProjectSystem;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CodeFactory.Automation.Standard.Logic;
+
 namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
 {
-    /// <summary>
-    /// Automation logic that supports integration testing using the MSTest unit test framework.
-    /// </summary>
-    public static class IntegrationTestBuilder
+	/// <summary>
+	/// Automation logic that supports integration testing using the MSTest unit test framework.
+	/// </summary>
+	public static class IntegrationTestBuilder
     {
         /// <summary>
         /// Automation to refresh the integration test implementation.
@@ -33,7 +33,7 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
 
             if (testProject == null) throw new CodeFactoryException($"No test project was provided cannot refresh the integration tests that support the contract '{contract.Name}'");
 
-            var isTestProject = await testProject.TestProjectIsConfiguredAsync(true);
+            var isTestProject = await testProject.TestProjectIsConfiguredMSTestAsync(true);
 
             await testProject.CreateTestLoaderAsync();
 
@@ -398,7 +398,7 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
         /// <param name="throwError">Optional flag that determines if an exception should be thrown if the project is not configred, default is false.</param>
         /// <returns>True if configured false if not.</returns>
         /// <exception cref="CodeFactoryException">Thrown if required data is missing.</exception>
-        public static async Task<bool> TestProjectIsConfiguredAsync(this VsProject project, bool throwError = false)
+        public static async Task<bool> TestProjectIsConfiguredMSTestAsync(this VsProject project, bool throwError = false)
         {
             if (project == null) throw new CodeFactoryException("No test project was provided cannot build integration tests.");
 

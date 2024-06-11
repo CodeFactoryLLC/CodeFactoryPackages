@@ -1,25 +1,21 @@
-﻿using CodeFactory.Automation.Standard.Logic.FluentValidation;
-using CodeFactory.Automation.Standard.Logic;
+﻿using CodeFactory.Automation.Standard.Logic;
+using CodeFactory.Automation.Standard.Logic.FluentValidation;
 using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.SolutionExplorer;
 using CodeFactory.WinVs.Logging;
-using CodeFactory.WinVs.Models.CSharp;
-using CodeFactory.WinVs.Models.CSharp.Builder;
 using CodeFactory.WinVs.Models.ProjectSystem;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 {
-    /// <summary>
-    /// Code factory command for automation of a C# document when selected from a project in solution explorer.
-    /// </summary>
-    public class RefreshFluentValidation : CSharpSourceCommandBase
+	/// <summary>
+	/// Code factory command for automation of a C# document when selected from a project in solution explorer.
+	/// </summary>
+	public class RefreshFluentValidationCommand : CSharpSourceCommandBase
     {
         private static readonly string commandTitle = "Refresh Validation";
         private static readonly string commandDescription = "Refreshes the fluent validation class that supports the class implemented in this source file.";
@@ -27,7 +23,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 #pragma warning disable CS1998
 
         /// <inheritdoc />
-        public RefreshFluentValidation(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public RefreshFluentValidationCommand(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -37,7 +33,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
         /// <summary>
         /// The fully qualified name of the command to be used with configuration.
         /// </summary>
-        public static string Type = typeof(RefreshFluentValidation).FullName;
+        public static string Type = typeof(RefreshFluentValidationCommand).FullName;
 
         /// <summary>
         /// The execution project that contains the definition of the model to refresh validation in.
@@ -67,7 +63,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
         public override ConfigCommand LoadExternalConfigDefinition()
         {
             return new ConfigCommand
-                    { Category = "ModelValidation", Name = nameof(RefreshFluentValidation), CommandType = Type }
+                    { Category = "ModelValidation", Name = nameof(RefreshFluentValidationCommand), CommandType = Type }
                 .UpdateExecutionProject
                 (
                     new ConfigProject

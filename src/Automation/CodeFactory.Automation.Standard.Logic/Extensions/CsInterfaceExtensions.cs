@@ -1,16 +1,14 @@
 ﻿using CodeFactory.WinVs.Models.CSharp;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace CodeFactory.Automation.Standard.Logic
+namespace CodeFactory.Automation.Standard.Logic.Extensions
 {
-    /// <summary>
-    /// Extension methods that support the <see cref="CsInterface"/>
-    /// </summary>
-    public static class CsInterfaceExtensions
+	/// <summary>
+	/// Extension methods that support the <see cref="CsInterface"/>
+	/// </summary>
+	public static class CsInterfaceExtensions
     {
         /// <summary>
         /// Gets all the interface methods implemented in the interface and all inherited interfaces.

@@ -1,20 +1,20 @@
-﻿using CodeFactory.WinVs.Logging;
-using CodeFactory.WinVs.Models.CSharp.Builder;
-using CodeFactory.WinVs.Models.CSharp;
-using CodeFactory.WinVs.Models.ProjectSystem;
+﻿using CodeFactory.Automation.Standard.Logic.Extensions;
 using CodeFactory.WinVs;
+using CodeFactory.WinVs.Logging;
+using CodeFactory.WinVs.Models.CSharp;
+using CodeFactory.WinVs.Models.CSharp.Builder;
+using CodeFactory.WinVs.Models.ProjectSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CodeFactory.Automation.Standard.Logic
 {
-    /// <summary>
-    /// Automation library that creates plain old CLR objects (POCOs).
-    /// </summary>
-    public static class POCOAutomation
+	/// <summary>
+	/// Automation library that creates plain old CLR objects (POCOs).
+	/// </summary>
+	public static class POCOAutomation
     {
         private static readonly ILogger _logger = LogManager.GetLogger(typeof(POCOAutomation));
 

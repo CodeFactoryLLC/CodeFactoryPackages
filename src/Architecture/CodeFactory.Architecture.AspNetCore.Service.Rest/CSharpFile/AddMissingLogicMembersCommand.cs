@@ -19,7 +19,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
     /// </summary>
-    public class AddMissingLogicMembers : CSharpSourceCommandBase
+    public class AddMissingLogicMembersCommand : CSharpSourceCommandBase
     {
         private static readonly string commandTitle = "Add Missing Logic Members";
         private static readonly string commandDescription = "Adds missing contract interface members to the Logic implementation.";
@@ -27,7 +27,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 #pragma warning disable CS1998
 
         /// <inheritdoc />
-        public AddMissingLogicMembers(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public AddMissingLogicMembersCommand(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -37,7 +37,7 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
         /// <summary>
         /// The fully qualified name of the command to be used with configuration.
         /// </summary>
-        public static string Type = typeof(AddMissingLogicMembers).FullName;
+        public static string Type = typeof(AddMissingLogicMembersCommand).FullName;
 
 
         /// <summary>
