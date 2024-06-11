@@ -155,21 +155,6 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 		public static string GenerateCrudOperations = "GenerateCrudOperations";
 
 		/// <summary>
-		/// Optional, flag to generate default Get operations.
-		/// </summary>
-		public static string GenerateGetOperations = "GenerateGetOperations";
-
-		/// <summary>
-		/// Optional, flag to generate default GetAll operations.
-		/// </summary>
-		public static string GenerateQueryOperations = "GenerateQueryOperations";
-
-		/// <summary>
-		/// Default page size for records returned in a service response.
-		/// </summary>
-		public static string DefaultPageSize = "DefaultPageSize";
-
-		/// <summary>
 		/// Loads the external configuration definition for this command.
 		/// </summary>
 		/// <returns>Will return the command configuration or null if this command does not support external configurations.</returns>
@@ -333,33 +318,6 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 							Name = GenerateCrudOperations,
 							Guidance = "True by default. Defines whether the initial contracts include methods for Create, Update, and Delete.",
 							Value = "true"
-						}
-					)
-					.AddParameter
-					(
-						new ConfigParameter
-						{
-							Name = GenerateGetOperations,
-							Guidance = "True by default. Defines whether the initial contracts include a method to Get a single record using the primary key as the default parameter.",
-							Value = "true"
-						}
-					)
-					.AddParameter
-					(
-						new ConfigParameter
-						{
-							Name = GenerateQueryOperations,
-							Guidance = "False by default. Defines whether the initial contracts include a method to Query records for the entity type.",
-							Value = "false"
-						}
-					)
-					.AddParameter
-					(
-						new ConfigParameter
-						{
-							Name = DefaultPageSize,
-							Guidance = "100 records by default. Defines the default number of records to be returned for IQueryable operations.",
-							Value = "100"
 						}
 					)
 				)
@@ -534,12 +492,9 @@ namespace CodeFactory.Architecture.AspNetCore.Service.Rest.CSharpFile
 
 				// Get boolean parameters to know what methods we are going to generate by default.
 				bool generateCrudOperations = bool.Parse(command.Project(RepoContractProject).ParameterValue(GenerateCrudOperations));
-				bool generateGetOperations = bool.Parse(command.Project(RepoContractProject).ParameterValue(GenerateGetOperations));
-				bool generateQueryOperations = bool.Parse(command.Project(RepoContractProject).ParameterValue(GenerateQueryOperations));
-				int defaultPageSize = int.Parse(command.Project(RepoContractProject).ParameterValue(DefaultPageSize));
 
-				var repoClass = await VisualStudioActions.RefreshEFRepositoryWithGetsAsync(repositoryName, efModel, repoProject, contractProject, appModel,
-					contextClass, supportsNDF, supportsLogging, repoFolder, contractFolder, generateCrudOperations, generateGetOperations, generateQueryOperations, defaultPageSize);
+				var repoClass = await VisualStudioActions.RefreshEFRepositoryWithCRUDAsync(repositoryName, efModel, repoProject, contractProject, appModel,
+					contextClass, supportsNDF, supportsLogging, repoFolder, contractFolder, generateCrudOperations);
 
 				if (repoClass != null & testProject != null)
 				{

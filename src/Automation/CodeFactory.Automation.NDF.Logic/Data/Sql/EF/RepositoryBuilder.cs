@@ -38,9 +38,9 @@ namespace Drives.Automation.NDF.Logic.Data.Sql.EF
 		/// <param name="additionRepositoryNamespaces">Optional, list of additional namespaces to update the repository with.</param>
 		/// <returns>Created or updated repository.</returns>
 		/// <exception cref="CodeFactoryException">Raised if required data to create or update the repository is missing.</exception>
-		public static async Task<CsClass> RefreshEFRepositoryWithGetsAsync(this IVsActions source, string repositoryName, CsClass efEntity, VsProject repoProject,
+		public static async Task<CsClass> RefreshEFRepositoryWithCRUDAsync(this IVsActions source, string repositoryName, CsClass efEntity, VsProject repoProject,
 			VsProject contractProject, CsClass poco, CsClass contextClass, bool useNDF = true, bool supportLogging = true, VsProjectFolder repoFolder = null, VsProjectFolder contractFolder = null,
-			bool generateCrudOperations = true, bool generateGetOperations = true, bool generateQueryOperations = false, int defaultPageSize = 100, List<ManualUsingStatementNamespace> additionRepositoryNamespaces = null,
+			bool generateCrudOperations = true, List<ManualUsingStatementNamespace> additionRepositoryNamespaces = null,
 			List<ManualUsingStatementNamespace> additionalContractNamespaces = null, string loggerFieldName = "_logger", LogLevel logLevel = LogLevel.Information)
 		{
 
@@ -71,7 +71,7 @@ namespace Drives.Automation.NDF.Logic.Data.Sql.EF
 
 			if (contractInterface == null)
 				contractInterface = (await source.CreateRepositoryContractAsync(contractName, efEntity, contractProject, poco,
-					contractFolder, additionalContractNamespaces, generateCrudOperations, generateGetOperations, generateQueryOperations, defaultPageSize)) ?? throw new CodeFactoryException("Could not create a repos");
+					contractFolder, additionalContractNamespaces, generateCrudOperations)) ?? throw new CodeFactoryException("Could not create a repos");
 
 			var repoName = repositoryName;
 
@@ -111,7 +111,7 @@ namespace Drives.Automation.NDF.Logic.Data.Sql.EF
 		/// <returns>Contract interface definition</returns>
 		/// <exception cref="CodeFactoryException">Raised if required data is missing to create the interface.</exception>
 		private static async Task<CsInterface> CreateRepositoryContractAsync(this IVsActions source, string contractName, CsClass efEntity, VsProject contractProject,
-		CsClass poco, VsProjectFolder contractFolder = null, List<ManualUsingStatementNamespace> additionalContractNamespaces = null, bool generateCrudOperations = true, bool generateGetOperations = true, bool generateQueryOperations = false, int defaultPageSize = 100)
+		CsClass poco, VsProjectFolder contractFolder = null, List<ManualUsingStatementNamespace> additionalContractNamespaces = null, bool generateCrudOperations = true)
 		{
 			if (source == null)
 				throw new CodeFactoryException("CodeFactory automation was not provided, cannot create the repository contract.");
@@ -173,24 +173,6 @@ namespace Drives.Automation.NDF.Logic.Data.Sql.EF
 				contractFormatter.AppendCodeLine(2, $"/// Deletes the instance of the <see cref=\"{poco?.Name}\"/> model.");
 				contractFormatter.AppendCodeLine(2, "/// </summary>");
 				contractFormatter.AppendCodeLine(2, $"Task DeleteAsync({poco?.Properties[0].PropertyType.Name}? {poco?.Properties[0].Name.GenerateCSharpCamelCase()});");
-			}
-
-			if (generateQueryOperations)
-			{
-				contractFormatter.AppendCodeLine(2);
-				contractFormatter.AppendCodeLine(2, "/// <summary>");
-				contractFormatter.AppendCodeLine(2, $"/// Query {poco?.Name.Pluralize()} for <see cref=\"{poco?.Name}\"/> model.");
-				contractFormatter.AppendCodeLine(2, "/// </summary>");
-				contractFormatter.AppendCodeLine(2, $"Task<List<{poco?.Name}>> QueryAsync(int? pageSize = {defaultPageSize}, int? pageNumber = 1);");
-			}
-
-			if (generateGetOperations)
-			{
-				contractFormatter.AppendCodeLine(2);
-				contractFormatter.AppendCodeLine(2, "/// <summary>");
-				contractFormatter.AppendCodeLine(2, $"/// Gets a {poco?.Name} based on an id, <see cref=\"{poco?.Name}\"/>.");
-				contractFormatter.AppendCodeLine(2, "/// </summary>");
-				contractFormatter.AppendCodeLine(2, $"Task<{poco?.Name}> GetAsync({poco?.Properties[0].PropertyType.Name}? {poco?.Properties[0].Name.GenerateCSharpCamelCase()});");
 			}
 
 			contractFormatter.AppendCodeLine(2);
@@ -446,25 +428,6 @@ namespace Drives.Automation.NDF.Logic.Data.Sql.EF
 						injectFormatter.AppendCodeLine(1, "await context.SaveChangesAsync();");
 						break;
 
-					case "GetAsync":
-						injectFormatter.AppendCodeLine(1, $"result = new {poco.Name}();");
-						injectFormatter.AppendCodeLine(1, $"var model = context.{efEntity.Name.Pluralize()}.FirstOrDefault(m => m.{poco.Properties[0].Name} == {poco.Properties[0].Name.GenerateCSharpCamelCase()});");
-						injectFormatter.AppendCodeLine(1, "result = model!.CreatePocoModel();");
-						break;
-
-					case "QueryAsync":
-						injectFormatter.AppendCodeLine(1, $"var models = context.Set<{efEntity.Name}>().AsNoTracking()");
-						injectFormatter.AppendCodeLine(2, $".Skip(pageNumber - 1) * pageSize)");
-						injectFormatter.AppendCodeLine(2, $".Take(pageSize).ToList();");
-						injectFormatter.AppendCodeLine(1, "if (models.Any())");
-						injectFormatter.AppendCodeLine(1, "{");
-						injectFormatter.AppendCodeLine(2, $"result = new List<{poco.Name}>();");
-						injectFormatter.AppendCodeLine(2, $"foreach({efEntity.Name} {efEntity.Name.GenerateCSharpCamelCase()} in models)");
-						injectFormatter.AppendCodeLine(2, "{");
-						injectFormatter.AppendCodeLine(3, $"result.Add({efEntity.Name.GenerateCSharpCamelCase()}.CreatePocoModel());");
-						injectFormatter.AppendCodeLine(2, "}");
-						injectFormatter.AppendCodeLine(1, "}");
-						break;
 					default:
 						injectFormatter.AppendCodeLine(0);
 						break;
