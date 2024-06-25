@@ -1,4 +1,4 @@
-﻿using CodeFactory.Automation.NDF.Logic.Testing.MSTest;
+﻿using CodeFactory.Automation.NDF.Logic.Testing.XUnit;
 using CodeFactory.Automation.Standard.Logic;
 using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
@@ -19,15 +19,15 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
     /// </summary>
-    public class RefreshTest : CSharpSourceCommandBase
+    public class RefreshXUnitIntegrationTest : CSharpSourceCommandBase
     {
-        private static readonly string commandTitle = "Refresh Test";
-        private static readonly string commandDescription = "Refreshes an integration test from the target interface.";
+        private static readonly string commandTitle = "Refresh XUnit Integration Test";
+        private static readonly string commandDescription = "Refreshes an integration test from the target interface that uses XUnit.";
 
 #pragma warning disable CS1998
 
         /// <inheritdoc />
-        public RefreshTest(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public RefreshXUnitIntegrationTest(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -37,7 +37,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         /// <summary>
         /// The fully qualified name of the command to be used with configuration.
         /// </summary>
-        public static string Type = typeof(RefreshTest).FullName;
+        public static string Type = typeof(RefreshXUnitIntegrationTest).FullName;
 
         /// <summary>
         /// Project executing the command
@@ -52,12 +52,18 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         /// <summary>
         /// Prefix to append to the name of the integration test being created.
         /// </summary>
-        public static string TestPrefix = "TestPrefix";
+        public static string TestClassPrefix = "TestClassPrefix";
 
         /// <summary>
         /// Suffix to append to the name of the integration test being created.
         /// </summary>
-        public static string TestSuffix = "TestSuffix";
+        public static string TestClassSuffix = "TestClassSuffix";
+
+        /// <summary>
+        /// Prefix(s) that will be used to create mutiple test methods for each contract method being tested.
+        /// </summary>
+        public static string TestMethodPrefixes = "TestMethodPrefixes";
+
 
 
         /// <summary>
@@ -66,37 +72,45 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         /// <returns>Will return the command configuration or null if this command does not support external configurations.</returns>
         public override ConfigCommand LoadExternalConfigDefinition()
         {
-            var config = new ConfigCommand 
-            { 
-                CommandType = Type, Category="Testing",
-                Name=nameof(RefreshTest),
-                Guidance="Automation command that generates integration tests from a provided interface." 
+            var config = new ConfigCommand
+            {
+                CommandType = Type,
+                Category = "Testing",
+                Name = nameof(RefreshTest),
+                Guidance = "Automation command that generates integration tests from a provided interface."
             }
             .UpdateExecutionProject
             (
                     new ConfigProject { Name = ExecutionProject, Guidance = "Enter the name of the project the command will trigger from." }
             )
-                
+
             .AddProject
             (
-                    new ConfigProject { Name = TestProject, Guidance = "Enter the name of the project that hosts the MSTest integration testings." }
+                    new ConfigProject { Name = TestProject, Guidance = "Enter the name of the project that hosts the XUnit integration testing." }
             )
             .AddParameter
             (
                 new ConfigParameter
-                { 
-                    Name = TestPrefix,
-                    Guidance = "Optional, prefix to append to the name of the integration test when being created."
+                {
+                    Name = TestClassPrefix,
+                    Guidance = "Optional, prefix to append to the name of the integration test class when being created."
                 }
             )
             .AddParameter
             (
                 new ConfigParameter
-                { 
-                    Name = TestSuffix,
-                    Guidance = "Optional, Suffix to append to the name of the integration test when being created.",
+                {
+                    Name = TestClassSuffix,
+                    Guidance = "Optional, Suffix to append to the name of the integration test class when being created.",
                     Value = "Test"
 
+                }
+            ).AddParameter
+            (
+                new ConfigParameter
+                {
+                    Name = TestMethodPrefixes,
+                    Guidance = "Optional, List of prefixes that will be added to the name of the test methods that test a target contract method. Store as comma separated values between prefixes."
                 }
             );
 
@@ -165,15 +179,30 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                 var targetInterface = result.SourceCode?.Interfaces?.FirstOrDefault()
                     ?? throw new CodeFactoryException("Could not locate the interface to have tests created from.");
 
-                var testPrefix = config.ParameterValue(TestPrefix);
-                var testSuffix = config.ParameterValue(TestSuffix);
+                var testClassPrefix = config.ParameterValue(TestClassPrefix);
+                var testClassSuffix = config.ParameterValue(TestClassSuffix);
+
+                var methodPrefixes = config.ParameterValue(TestMethodPrefixes);
+
+                List<string> testMethodPrefixes = null;
+
+                if (methodPrefixes != null)
+                {
+                    testMethodPrefixes = new List<string>();
+                    var prefixeData = methodPrefixes.Split(',');
+
+                    foreach (var prefix in prefixeData)
+                    {
+                        testMethodPrefixes.Add(prefix.Trim());
+                    }
+                }
 
                 string noRemove = null;
 
-                var testName = NameManagement.Init(noRemove,noRemove,testPrefix,testSuffix).FormatName(targetInterface.Name.GenerateCSharpFormattedClassName());
+                var testName = NameManagement.Init(noRemove,noRemove,testClassPrefix,testClassSuffix).FormatName(targetInterface.Name.GenerateCSharpFormattedClassName());
 
 
-                var test = VisualStudioActions.RefreshMSTestIntegrationTestAsync(testName,targetInterface, testProject);
+                var test = VisualStudioActions.RefreshXUnitIntegrationTestAsync(testName,targetInterface, testProject,testMethodPrefixes);
 
 
             }

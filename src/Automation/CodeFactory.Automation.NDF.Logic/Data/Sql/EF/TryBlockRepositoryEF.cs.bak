@@ -9,14 +9,14 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
 {
 
     /// <summary>
-    /// Try basic code block standard implementation. Supports injection of syntax inside the try block, it also will generate the catch and finally blocks if they are provided.
+    /// Try basic code block standard implementation. Supports injection of syntax insidet he try block, it also will generate the catch and finally blocks if they are provided.
     /// </summary>
     public class TryBlockRepositoryEF : BaseTryBlock
     {
         private readonly string _efContextName; 
         
         /// <summary>
-        ///  Creates an instance of the try block that supports using context in the try block definition.
+        ///  Creates a instance of the try block that supports using contenxt in the try block definition.
         /// </summary>
         /// <param name="loggerBlock">Optional parameter that provides the logger block.</param>
         /// <param name="catchBlocks">Optional parameter catch blocks that support the try block.</param>

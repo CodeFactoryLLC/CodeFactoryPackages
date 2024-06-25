@@ -8,6 +8,7 @@ using CodeFactory.WinVs.Logging;
 using CodeFactory.WinVs.Models.CSharp;
 using CodeFactory.WinVs.Models.CSharp.Builder;
 using CodeFactory.WinVs.Models.ProjectSystem;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -29,7 +30,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 #pragma warning disable CS1998
 
         /// <inheritdoc />
-        public AddMissingControllerMembers(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public AddMissingControllerMembers(CodeFactory.WinVs.Logging.ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -43,7 +44,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 
 
         /// <summary>
-        /// Exection project for the command.
+        /// Execution project for the command.
         /// </summary>
         public static string ExecutionProject = "ExecutionProject";
 
@@ -193,16 +194,16 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                 var loggerBlock = new LoggerBlockNDFLogger("_logger");
 
                 var catchBlocks = new List<ICatchBlock>
-                { 
-                    new CatchBlockManagedExceptionBlazorControllerMessage(loggerBlock),
-                    new CatchBlockExceptionBlazorControllerMessage(loggerBlock)
+                {
+                    new CatchBlockManagedExceptionNDFException(loggerBlock,LogLevel.Error),
+                    new CatchBlockExceptionNDFException(loggerBlock)
                 };
 
                 var boundChecks = new List<IBoundsCheckBlock>
-                { 
-                  
-                    new BoundsCheckBlockNullBlazorControllerMessage(true,loggerBlock),
-                    new BoundsCheckBlockStringBlazorControllerMessage(true,loggerBlock)
+                {
+
+                    new BoundsCheckBlockStringNDFException(true,loggerBlock),
+                    new BoundsCheckBlockNull(true,loggerBlock)
                 };
 
                 var tryBlock = new TryBlockStandard(loggerBlock,catchBlocks);

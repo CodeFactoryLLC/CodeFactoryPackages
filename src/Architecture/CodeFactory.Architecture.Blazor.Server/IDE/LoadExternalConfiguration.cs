@@ -47,6 +47,9 @@ namespace CodeFactory.Architecture.Blazor.Server.IDE
                 var refreshTest = new RefreshTest(null, null);
                 refreshTest.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 
+                var refreshXUnitIntegrationTest = new RefreshXUnitIntegrationTest(null, null);
+                refreshXUnitIntegrationTest.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
+
                 var refreshFluentValidation = new RefreshFluentValidation(null, null);
                 refreshFluentValidation.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
 

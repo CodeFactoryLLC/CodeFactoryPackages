@@ -20,11 +20,11 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
         /// <param name="source">CodeFactory automation</param>
         /// <param name="contextName">Name of the context class.</param>
         /// <param name="modelProject">The entity framework project hosting models.</param>
-        /// <param name="modelFolder">Optional parameter that holds the target profile folders the models live in.</param>
+        /// <param name="contextFolder">Optional parameter that holds the target profile folders the models live in.</param>
         /// <returns>Refreshed instance of the DbContext</returns>
         /// <exception cref="CodeFactoryException">Raised if required data is missing.</exception>
         public static async Task<CsClass> RefreshDbContextAsync(this IVsActions source, string contextName,
-            VsProject modelProject, VsProjectFolder modelFolder)
+            VsProject modelProject, VsProjectFolder contextFolder = null)
         {
             if (source == null)
                 throw new CodeFactoryException("CodeFactory automation was not provided, cannot refresh the DbContext.");
@@ -38,15 +38,23 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
                     "The entity framework project was not provided, cannot refresh the DbContext.");
 
 
-            var contextClass = (await modelProject.FindCSharpSourceByClassNameAsync(contextName))
-                                 ?.SourceCode?.Classes?.FirstOrDefault()
-                                 ?? throw new CodeFactoryException($"The entity framework context class '{contextName}' could not be loaded, cannot refresh the EF repository,");
+
+            var contextFile = await modelProject.FindCSharpSourceByClassNameAsync(contextName)
+                              ?? throw new CodeFactoryException($"The entity framework context class '{contextName}' could not be loaded, cannot refresh the EF repository,"); ;
+
+            if (contextFolder == null)
+            {
+                contextFolder = await contextFile.GetParentProjectFolderAsync();
+            }
+            
+            var contextClass = contextFile?.SourceCode?.Classes?.FirstOrDefault()
+                               ?? throw new CodeFactoryException($"The entity framework context class '{contextName}' could not be loaded, cannot refresh the EF repository,");
 
             CsSource contextSource = null;
 
-            if (modelFolder != null)
+            if (contextFolder != null)
             {
-                var folderChildren = await modelFolder.GetChildrenAsync(false, true);
+                var folderChildren = await contextFolder.GetChildrenAsync(false, true);
                 contextSource = folderChildren.Where(m => m.ModelType == VisualStudioModelType.CSharpSource).Cast<VsCSharpSource>().FirstOrDefault(s => s.Name == $"{contextName}.Load.cs")?.SourceCode;
             }
             else
@@ -56,17 +64,17 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             }
 
             if(contextSource == null) contextSource = await 
-                CreateDbContextLoad(source,contextClass,modelProject,modelFolder);
+                CreateDbContextLoad(source,contextClass,modelProject, contextFolder);
 
-            var connectionStringInterface = (modelFolder != null
-                ? (await modelFolder.FindCSharpSourceByInterfaceNameAsync("IDBContextConnection"))?.SourceCode?.Interfaces?.FirstOrDefault()
+            var connectionStringInterface = (contextFolder != null
+                ? (await contextFolder.FindCSharpSourceByInterfaceNameAsync("IDBContextConnection"))?.SourceCode?.Interfaces?.FirstOrDefault()
                 : (await modelProject.FindCSharpSourceByInterfaceNameAsync("IDBContextConnection"))?.SourceCode?.Interfaces?.FirstOrDefault()) 
-                ?? await source.CreateConnectionStringInterfaceAsync(modelProject, modelFolder);
+                ?? await source.CreateConnectionStringInterfaceAsync(modelProject, contextFolder);
 
-            var connectionStringClass = (modelFolder != null
-                                                ? (await modelFolder.FindCSharpSourceByClassNameAsync("DBContextConnection"))?.SourceCode?.Classes?.FirstOrDefault()
+            var connectionStringClass = (contextFolder != null
+                                                ? (await contextFolder.FindCSharpSourceByClassNameAsync("DBContextConnection"))?.SourceCode?.Classes?.FirstOrDefault()
                                                 : (await modelProject.FindCSharpSourceByClassNameAsync("DBContextConnection"))?.SourceCode?.Classes?.FirstOrDefault())
-                                            ?? await source.CreateConnectionStringClassAsync(modelProject, modelFolder);
+                                            ?? await source.CreateConnectionStringClassAsync(modelProject, contextFolder);
 
             return contextSource?.Classes?.FirstOrDefault();
         }
@@ -77,11 +85,11 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
         /// <param name="source">CodeFactory Automation</param>
         /// <param name="contextClass">The context class to be updated.</param>
         /// <param name="modelProject">The entity framework project hosting models.</param>
-        /// <param name="modelFolder">Optional parameter that holds the target profile folders the models live in.</param>
+        /// <param name="contextFolder">Optional parameter that holds the target profile folders the models live in.</param>
         /// <returns>Updated class for the DbContext</returns>
         /// <exception cref="CodeFactoryException">Required information is missing.</exception>
         private static async Task<CsSource> CreateDbContextLoad(this IVsActions source,CsClass contextClass,
-            VsProject modelProject, VsProjectFolder modelFolder = null)
+            VsProject modelProject, VsProjectFolder contextFolder = null)
         {
             SourceFormatter loadFormatter = new SourceFormatter();
 
@@ -127,7 +135,7 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             loadFormatter.AppendCodeLine(1, "}");
             loadFormatter.AppendCodeLine(0, "}");
 
-            var doc = modelFolder != null ? await modelFolder.AddDocumentAsync($"{contextClass.Name}.Load.cs", loadFormatter.ReturnSource())
+            var doc = contextFolder != null ? await contextFolder.AddDocumentAsync($"{contextClass.Name}.Load.cs", loadFormatter.ReturnSource())
                 : await modelProject.AddDocumentAsync($"{contextClass.Name}.Load.cs", loadFormatter.ReturnSource());
 
             return doc == null
@@ -141,16 +149,16 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
         /// </summary>
         /// <param name="source">CodeFactory automation.</param>
         /// <param name="modelProject">The entity framework project hosting models.</param>
-        /// <param name="modelFolder">Optional parameter that holds the target profile folders the models live in.</param>
+        /// <param name="contextFolder">Optional parameter that holds the target profile folders the models live in.</param>
         /// <returns>Created interface</returns>
         /// <exception cref="CodeFactoryException">Raised if required data is missing.</exception>
         private static async Task<CsInterface> CreateConnectionStringInterfaceAsync(this IVsActions source,
-    VsProject modelProject, VsProjectFolder modelFolder = null)
+    VsProject modelProject, VsProjectFolder contextFolder = null)
         {
             SourceFormatter connectionFormatter = new SourceFormatter();
 
-            string targetNamespace = modelFolder != null
-                ? await modelFolder.GetCSharpNamespaceAsync()
+            string targetNamespace = contextFolder != null
+                ? await contextFolder.GetCSharpNamespaceAsync()
                 : modelProject.DefaultNamespace;
 
             connectionFormatter.AppendCodeLine(0, "using System;");
@@ -174,7 +182,7 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             connectionFormatter.AppendCodeLine(1, "}");
             connectionFormatter.AppendCodeLine(0, "}");
 
-            var doc = modelFolder != null ? await modelFolder.AddDocumentAsync("IDBContextConnection.cs", connectionFormatter.ReturnSource())
+            var doc = contextFolder != null ? await contextFolder.AddDocumentAsync("IDBContextConnection.cs", connectionFormatter.ReturnSource())
                 : await modelProject.AddDocumentAsync("IDBContextConnection.cs", connectionFormatter.ReturnSource());
 
             return doc == null
@@ -187,16 +195,16 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
         /// </summary>
         /// <param name="source">CodeFactory automation.</param>
         /// <param name="modelProject">The entity framework project hosting models.</param>
-        /// <param name="modelFolder">Optional parameter that holds the target profile folders the models live in.</param>
+        /// <param name="contextFolder">Optional parameter that holds the target profile folders the models live in.</param>
         /// <returns>Created interface</returns>
         /// <exception cref="CodeFactoryException">Raised if required data is missing.</exception>
         private static async Task<CsClass> CreateConnectionStringClassAsync(this IVsActions source,
-        VsProject modelProject, VsProjectFolder modelFolder)
+        VsProject modelProject, VsProjectFolder contextFolder)
         {
             SourceFormatter connectionFormatter = new SourceFormatter();
 
-            string targetNamespace = modelFolder != null
-                ? await modelFolder.GetCSharpNamespaceAsync()
+            string targetNamespace = contextFolder != null
+                ? await contextFolder.GetCSharpNamespaceAsync()
                 : modelProject.DefaultNamespace;
 
             connectionFormatter.AppendCodeLine(0, "using System;");
@@ -233,7 +241,7 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             connectionFormatter.AppendCodeLine(1, "}");
             connectionFormatter.AppendCodeLine(0, "}");
 
-            var doc = modelFolder != null ? await modelFolder.AddDocumentAsync("DBContextConnection.cs", connectionFormatter.ReturnSource())
+            var doc = contextFolder != null ? await contextFolder.AddDocumentAsync("DBContextConnection.cs", connectionFormatter.ReturnSource())
                 : await modelProject.AddDocumentAsync("DBContextConnection.cs", connectionFormatter.ReturnSource());
 
             return doc == null

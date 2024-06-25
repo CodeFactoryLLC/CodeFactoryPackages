@@ -47,7 +47,7 @@ namespace CodeFactory.Automation.NDF.Logic
                 formatter.AppendCodeLine(1,LoggerBlock.GenerateLogging(LogLevel.Error, errorMessage,true));
                 formatter.AppendCodeLine(1, LoggerBlock.GenerateExitLogging(LogLevel.Error,sourceMethod.Name));
             }
-            formatter.AppendCodeLine(1,$"throw new ArgumentNullException(nameof({checkParameter.Name}));");
+            formatter.AppendCodeLine(1,$"throw new ValidationException(nameof({checkParameter.Name}));");
             formatter.AppendCodeLine(0,"}");
             
             return (true,formatter.ReturnSource());

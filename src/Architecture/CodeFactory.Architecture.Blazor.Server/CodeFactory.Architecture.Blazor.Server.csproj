@@ -52,6 +52,7 @@
     <Compile Include="CSharpFile\AddMissingLogicMembers.cs" />
     <Compile Include="CSharpFile\AddMissingRepositoryMembers.cs" />
     <Compile Include="CSharpFile\RefreshLogic.cs" />
+    <Compile Include="CSharpFile\RefreshXUnitIntegrationTest.cs" />
     <Compile Include="Solution\CreateAutomationConfiguration.cs" />
     <Compile Include="IDE\LoadExternalConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

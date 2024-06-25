@@ -261,6 +261,8 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             repoFormatter.AppendCodeLine(0, $"using {efEntity.Namespace};");
             repoFormatter.AppendCodeLine(0, $"using {poco.Namespace};");
             repoFormatter.AppendCodeLine(0, $"using {repoContract.Namespace};");
+            if(defaultNamespace != contextClass.Namespace)
+                repoFormatter.AppendCodeLine(0, $"using {contextClass.Namespace};");
             repoFormatter.AppendCodeLine(0);
             repoFormatter.AppendCodeLine(0, $"namespace {defaultNamespace}");
             repoFormatter.AppendCodeLine(0, "{");
@@ -449,7 +451,7 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
         {
             if (source == null) return false;
 
-            bool useSource = (source.HasGet & source.HasSet & source.Security == CsSecurity.Public & !source.IsStatic);
+            bool useSource = (source.HasGet & source.HasSet & source.Security == CsSecurity.Public & !source.IsStatic & !source.IsVirtual);
 
             if (source.HasAttributes & useSource)
             {

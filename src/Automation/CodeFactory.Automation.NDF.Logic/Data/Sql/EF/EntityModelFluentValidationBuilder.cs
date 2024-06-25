@@ -29,7 +29,7 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
         private const string StringLengthAttribute = "StringLengthAttribute";
 
         /// <summary>
-        /// Refreshes the implementation of fluent validation logic for data annoations assigned to a class.
+        /// Refreshes the implementation of fluent validation logic for data annotations assigned to a class.
         /// </summary>
         /// <param name="source">CodeFactory automation.</param>
         /// <param name="sourceModel">Source data model that contains data annotations.</param>
@@ -102,7 +102,7 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
         }
 
         /// <summary>
-        /// Extension method that will format a required rule if the property has the data annoation for Required.
+        /// Extension method that will format a required rule if the property has the data annotation for Required.
         /// </summary>
         /// <param name="source">Property to evaluate.</param>
         /// <returns>Null if the required rule does not apply, or the fully formatted validation rule.</returns>
@@ -120,7 +120,7 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
         }
 
         /// <summary>
-        /// Extension method that will format a string length rule if the property has the data annoation for Required.
+        /// Extension method that will format a string length rule if the property has the data annotation for Required.
         /// </summary>
         /// <param name="source">Property to evaluate.</param>
         /// <returns>Null if the string length rule does not apply, or the fully formatted validation rule.</returns>
@@ -134,11 +134,11 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
 
             if(required == null) return null;   
 
-            var lengthParm =  required.Parameters.FirstOrDefault();
+            var lengthParam =  required.Parameters.FirstOrDefault();
 
-            if (lengthParm == null) return null;
+            if (lengthParam == null) return null;
             
-            var stringLength = lengthParm?.Value?.Value;
+            var stringLength = lengthParam?.Value?.Value;
 
             if (string.IsNullOrEmpty(stringLength)) return null;
 

@@ -22,7 +22,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
     public class UpdateLogicImplementation : CSharpSourceCommandBase
     {
         private static readonly string commandTitle = "Update Logic Implementation";
-        private static readonly string commandDescription = "Clones changes from the respository contract to the logic contract and refreshes the logic implementation.";
+        private static readonly string commandDescription = "Clones changes from the repository contract to the logic contract and refreshes the logic implementation.";
 
 #pragma warning disable CS1998
 

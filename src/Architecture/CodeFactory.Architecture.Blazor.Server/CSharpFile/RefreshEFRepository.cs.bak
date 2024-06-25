@@ -65,11 +65,6 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         public static string EntityFolder = "EntityFolder";
 
         /// <summary>
-        /// The target folder where application entity validators will be created and stored. This is optional and only used when entity validators are stored in a target folder.
-        /// </summary>
-        public static string EntityValidatorFolder = "EntityValidatorFolder";
-
-        /// <summary>
         /// The repository project where repositories will be created or updated in.
         /// </summary>
         public static string RepoProject = "RepoProject";
@@ -105,12 +100,12 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         public static string EFContextClassName = "EFContextClassName";
 
         /// <summary>
-        /// Optional, list of prefixes separated by comma to remove from the name of the entity framework entity.
+        /// Optional, list of prefixes seperated by comma to remove from the name of the entity framework entity.
         /// </summary>
         public static string EFEntityRemovePrefixes = "EFEntityRemovePrefixes";
 
         /// <summary>
-        /// Optional, list of prefixes separated by comma to remove from the name of the entity framework entity.
+        /// Optional, list of prefixes seperated by comma to remove from the name of the entity framework entity.
         /// </summary>
         public static string EFEntityRemoveSuffixes = "EFEntityRemoveSuffixes";
         
@@ -125,32 +120,32 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         public static string RepositorySuffix = "RepositorySuffix";
 
         /// <summary>
-        /// Optional, prefix to assign to an application model when creating.
+        /// Optional, prefix to assign to a application model when creating.
         /// </summary>
         public static string AppModelPrefix ="AppModelPrefix"; 
 
         /// <summary>
-        /// Optional, suffix to assign to an application model when creating.
+        /// Optional, suffix to assign to a application model when creating.
         /// </summary>
         public static string AppModelSuffix ="AppModelSuffix"; 
 
         /// <summary>
-        /// Optional, prefix to assign to an integration test when creating.
+        /// Optional, prefix to assign to a integration test when creating.
         /// </summary>
         public static string TestPrefix ="TestPrefix"; 
 
         /// <summary>
-        /// Optional, suffix to assign to an integration test when creating.
+        /// Optional, suffix to assign to a integration test when creating.
         /// </summary>
         public static string TestSuffix ="TestSuffix"; 
 
         /// <summary>
-        /// The prefix to assign to the name of an application models validation class.
+        /// The prefix to assign to the name of a application models validation class.
         /// </summary>
         public static string AppModelValidatorPrefix = "AppModelValidatorPrefix";
 
         /// <summary>
-        /// The suffix to assign to the name of an application models validation class.
+        /// The suffix to assign to the name of a application models validation class.
         /// </summary>
         public static string AppModelValidatorSuffix = "AppModelValidatorSuffix";
 
@@ -191,7 +186,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                         new ConfigParameter
                         { 
                             Name = EFEntityRemovePrefixes,
-                            Guidance = "Comma separated value list of the prefixes in case sensitive format to be removed from the entity framework entity name when creating new objects."
+                            Guidance = "Comma seperated value list of the prefixes in case sensitive format to be removed from the entity framework entity name when creating new objects."
                         }
                     )
                     .AddParameter
@@ -199,7 +194,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                         new ConfigParameter
                         { 
                             Name = EFEntityRemoveSuffixes,
-                            Guidance = "Comma separated value list of the suffixes in case sensitive format to be removed from the entity framework entity name when creating new objects."
+                            Guidance = "Comma seperated value list of the suffixes in case sensitive format to be removed from the entity framework entity name when creating new objects."
                         }
                     )
                 )
@@ -216,16 +211,6 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                         new ConfigFolder
                         {
                             Name = EntityFolder,
-                            Required = false,
-                            Guidance =
-                                "Optional, set the relative path from the root of the project. If it is more then one directory deep then use '/' instead of back slashes."
-                        }
-                    )
-                    .AddFolder
-                    (
-                        new ConfigFolder
-                        {
-                            Name = EntityValidatorFolder,
                             Required = false,
                             Guidance =
                                 "Optional, set the relative path from the root of the project. If it is more then one directory deep then use '/' instead of back slashes."
@@ -410,7 +395,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                     await VisualStudioActions.GetProjectFolderFromConfigAsync(command.ExecutionProject, ExecutionModelFolder);
 
                 var contextClassName = command.ExecutionProject.ParameterValue(EFContextClassName);
-                var efEntityRemovePrefixes = command.ExecutionProject.ParameterValue(EFEntityRemovePrefixes);
+                var efEntityRemovePrefixs = command.ExecutionProject.ParameterValue(EFEntityRemovePrefixes);
                 var efEntityRemoveSuffixes = command.ExecutionProject.ParameterValue(EFEntityRemoveSuffixes);
 
                 VsProject appModelProject = await VisualStudioActions.GetProjectFromConfigAsync(command.Project(EntityProject))
@@ -418,9 +403,6 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 
                 VsProjectFolder appModelFolder =
                     await VisualStudioActions.GetProjectFolderFromConfigAsync(command.Project(EntityProject), EntityFolder);
-
-                VsProjectFolder appModelValidatorFolder =
-                    await VisualStudioActions.GetProjectFolderFromConfigAsync(command.Project(EntityProject), EntityValidatorFolder) ?? appModelFolder;
 
                 var appModelPrefix = command.Project(EntityProject).ParameterValue(AppModelPrefix);
                 var appModelSuffix = command.Project(EntityProject).ParameterValue(AppModelSuffix);
@@ -460,11 +442,11 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                     throw new CodeFactoryException(
                         "The entity framework context class name was not provided, cannot refresh the EF repository.");
 
-                var contextClass = (await efModelProject.FindCSharpSourceByClassNameAsync(contextClassName))
-                                   ?.SourceCode?.Classes?.FirstOrDefault()
-                                   ?? throw new CodeFactoryException($"The entity framework context class '{contextClassName}' could not be loaded, cannot refresh the EF repository,");
+                 var contextClass = (await efModelProject.FindCSharpSourceByClassNameAsync(contextClassName))
+                                     ?.SourceCode?.Classes?.FirstOrDefault()
+                                     ?? throw new CodeFactoryException($"The entity framework context class '{contextClassName}' could not be loaded, cannot refresh the EF repository,");
 
-                await VisualStudioActions.RefreshDbContextAsync(contextClassName, efModelProject, null);
+                await VisualStudioActions.RefreshDbContextAsync(contextClassName, efModelProject, efModelFolder);
 
                 bool supportsLogging = await repoProject.SupportsLogging();
 
@@ -473,7 +455,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                 var efModel = result.SourceCode?.Classes?.FirstOrDefault()
                     ?? throw new CodeFactoryException("The EF entity class could not be loaded, cannot refresh the EF repository.");
 
-                var nameManagement = NameManagement.Init(efEntityRemovePrefixes,efEntityRemoveSuffixes,appModelPrefix,appModelSuffix);
+                var nameManagement = NameManagement.Init(efEntityRemovePrefixs,efEntityRemoveSuffixes,appModelPrefix,appModelSuffix);
 
                 var appModel = (await VisualStudioActions.RefreshModelAsync(efModel, appModelProject,
                                    EntityModelNamespaces(),nameManagement, appModelFolder, $"Application data model that supports '{efModel.Name}'", true,useSourceProperty: RepositoryBuilder.UseSourceProperty))
@@ -484,7 +466,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 
                 var modelValidatorNameManagement = NameManagement.Init(noReplacePrefix,noReplaceSuffix,appModelValidatorPrefix,appModelValidatorSuffix);
                 
-                var validation = (await VisualStudioActions.RefreshValidationClassAsync(appModel,appModelProject, appModelValidatorFolder, modelValidatorNameManagement))
+                var validation = (await VisualStudioActions.RefreshValidationClassAsync(appModel,appModelProject,appModelFolder,modelValidatorNameManagement))
                                 ?? throw new CodeFactoryException($"Could not refresh the validation for the app model '{appModel.Name}', cannot refresh the EF repository.");
 
                 await VisualStudioActions.RefreshFluentValidationAsync(efModel,appModel,validation);
@@ -492,7 +474,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                 await VisualStudioActions.RefreshEntityFrameworkEntityTransform(appModel, efModel, efModelProject,
                     efModelFolder);
 
-                var repositoryName = NameManagement.Init(efEntityRemovePrefixes,efEntityRemoveSuffixes,repoPrefix,repoSuffix).FormatName(efModel.Name);
+                var repositoryName = NameManagement.Init(efEntityRemovePrefixs,efEntityRemoveSuffixes,repoPrefix,repoSuffix).FormatName(efModel.Name);
 
                 var repoClass = await VisualStudioActions.RefreshEFRepositoryAsync(repositoryName,efModel, repoProject, contractProject, appModel,
                     contextClass, supportsNDF, supportsLogging, repoFolder, contractFolder);
@@ -506,10 +488,10 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                     : (await contractProject.FindCSharpSourceByInterfaceNameAsync(contractName))?.SourceCode?.Interfaces?.FirstOrDefault();
                     
                     if(contractInterface != null)
-                    { 
-                        var testName = NameManagement.Init(noReplacePrefix,noReplaceSuffix,testPrefix,testSuffix).FormatName(repositoryName);
-                        await VisualStudioActions.RefreshMSTestIntegrationTestAsync(testName, contractInterface,testProject); 
-                    }
+                        { 
+                            var testName = NameManagement.Init(noReplacePrefix,noReplaceSuffix,testPrefix,testSuffix).FormatName(repositoryName);
+                            await VisualStudioActions.RefreshMSTestIntegrationTestAsync(testName, contractInterface,testProject); 
+                        }
                 }
 
             }
@@ -529,7 +511,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         #endregion
 
         /// <summary>
-        /// Helper method that creates the default namespaces to add to a new entity class that is created.
+        /// Helper method that creates the default namespaces to add to a new entity class that is crearted.
         /// </summary>
         /// <returns>List of using statements to use.</returns>
         private List<IUsingStatementNamespace> EntityModelNamespaces()
