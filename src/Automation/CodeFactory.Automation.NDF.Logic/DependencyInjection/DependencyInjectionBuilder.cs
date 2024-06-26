@@ -46,7 +46,7 @@ namespace CodeFactory.Automation.NDF.Logic.DependencyInjection
             loaderFormatter.AppendCodeLine(0, "{");
 
             loaderFormatter.AppendCodeLine(1, "/// <summary>");
-            loaderFormatter.AppendCodeLine(1, $"Dependency injection loader for the library '{project.DefaultNamespace}'");
+            loaderFormatter.AppendCodeLine(1, $"/// Dependency injection loader for the library '{project.DefaultNamespace}'");
             loaderFormatter.AppendCodeLine(1, "/// </summary>");
             loaderFormatter.AppendCodeLine(1, $"public class {className}: DependencyInjectionLoader");
             loaderFormatter.AppendCodeLine(1, "{");
@@ -78,7 +78,7 @@ namespace CodeFactory.Automation.NDF.Logic.DependencyInjection
             loaderFormatter.AppendCodeLine(2, "/// </summary>");
             loaderFormatter.AppendCodeLine(2, "/// <param name=\"serviceCollection\">The dependency injection provider to register services with.</param>");
             loaderFormatter.AppendCodeLine(2, "/// <param name=\"configuration\">The source configuration to provide for dependency injection.</param>");
-            loaderFormatter.AppendCodeLine(2, $"protected override void LoadManualRegistration(IServiceCollection serviceCollection, IConfiguration configuration)");
+            loaderFormatter.AppendCodeLine(2, $"protected override void LoadRegistration(IServiceCollection serviceCollection, IConfiguration configuration)");
             loaderFormatter.AppendCodeLine(2, "{");
             loaderFormatter.AppendCodeLine(3, "//DO NOT TOUCH..... Loaded through the software factory.");
             loaderFormatter.AppendCodeLine(2, "}");

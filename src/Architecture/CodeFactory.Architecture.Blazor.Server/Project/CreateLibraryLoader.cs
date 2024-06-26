@@ -80,13 +80,13 @@ namespace CodeFactory.Architecture.Blazor.Server.Project
                 //Checking for dependency injection libraries and NDF.
                 isEnabled = references.Any(r => r.Name == "Microsoft.Extensions.DependencyInjection.Abstractions");
                 if(isEnabled) isEnabled = references.Any(r => r.Name == "Microsoft.Extensions.Configuration.Abstractions");
-                if (isEnabled) isEnabled = references.All(r => r.Name == "CodeFactory.NDF");
+                if (isEnabled) isEnabled = references.Any(r => r.Name == "CodeFactory.NDF");
 
                 if (isEnabled)
                 { 
                     //Checking all c# files at the root of the project to see if library loader has already been implemented.
                     var projectFiles = (await result.GetChildrenAsync(false, true)).Where(m => m.ModelType == VisualStudioModelType.CSharpSource).Cast<VsCSharpSource>().ToList();
-                    isEnabled = projectFiles.Any(f => (f.SourceCode?.Classes?.Any(c => c.Name == "LibraryLoader")).GetValueOrDefault(false));
+                    isEnabled = !projectFiles.Any(f => (f.SourceCode?.Classes?.Any(c => c.Name == "LibraryLoader")).GetValueOrDefault(false));
                 }
             }
             catch (Exception unhandledError)
