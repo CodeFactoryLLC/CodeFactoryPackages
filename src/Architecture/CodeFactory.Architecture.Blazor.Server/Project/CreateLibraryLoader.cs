@@ -1,5 +1,6 @@
 ﻿using CodeFactory.Architecture.Blazor.Server.CSharpFile;
 using CodeFactory.Automation.NDF.Logic;
+using CodeFactory.Automation.NDF.Logic.DependencyInjection;
 using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.SolutionExplorer;
@@ -12,22 +13,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace CodeFactory.Architecture.Blazor.Server.Project
 {
-/// <summary>
+    /// <summary>
     /// Code factory command for automation of a project when selected from solution explorer.
     /// </summary>
-    public class RegisterTransientServices : ProjectCommandBase
+    public class CreateLibraryLoader : ProjectCommandBase
     {
-        private static readonly string commandTitle = "Register Transient Services";
-        private static readonly string commandDescription = "Registers Transient classes with a NDF dependency injection loader for a target project.";
+        private static readonly string commandTitle = "Create Library Loader";
+        private static readonly string commandDescription = "Create a instance of the LibraryLoader class if it is missing from the project.";
 
 #pragma warning disable CS1998
 
         /// <inheritdoc />
-        public RegisterTransientServices(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public CreateLibraryLoader(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -38,7 +38,7 @@ namespace CodeFactory.Architecture.Blazor.Server.Project
         /// <summary>
         /// The fully qualified name of the command to be used with configuration.
         /// </summary>
-        public static string Type = typeof(RegisterTransientServices).FullName;
+        public static string Type = typeof(CreateLibraryLoader).FullName;
 
         /// <summary>
         /// Loads the external configuration definition for this command.
@@ -54,7 +54,7 @@ namespace CodeFactory.Architecture.Blazor.Server.Project
         /// </summary>
         public static void RegisterDefaultConfiguration()
         {
-            var command = new RegisterTransientServices(null, null);
+            var command = new CreateLibraryLoader(null, null);
             var config = command.LoadExternalConfigDefinition();
             config?.RegisterCommandWithDefaultConfiguration();
         }
@@ -74,7 +74,20 @@ namespace CodeFactory.Architecture.Blazor.Server.Project
 
             try
             {
-                isEnabled = await result.CanRegisterTransientClassesAsync();
+
+                var references = await result.GetProjectReferencesAsync();
+
+                //Checking for dependency injection libraries and NDF.
+                isEnabled = references.Any(r => r.Name == "Microsoft.Extensions.DependencyInjection.Abstractions");
+                if(isEnabled) isEnabled = references.Any(r => r.Name == "Microsoft.Extensions.Configuration.Abstractions");
+                if (isEnabled) isEnabled = references.All(r => r.Name == "CodeFactory.NDF");
+
+                if (isEnabled)
+                { 
+                    //Checking all c# files at the root of the project to see if library loader has already been implemented.
+                    var projectFiles = (await result.GetChildrenAsync(false, true)).Where(m => m.ModelType == VisualStudioModelType.CSharpSource).Cast<VsCSharpSource>().ToList();
+                    isEnabled = projectFiles.Any(f => (f.SourceCode?.Classes?.Any(c => c.Name == "LibraryLoader")).GetValueOrDefault(false));
+                }
             }
             catch (Exception unhandledError)
             {
@@ -94,11 +107,7 @@ namespace CodeFactory.Architecture.Blazor.Server.Project
         {
             try
             {
-                await VisualStudioActions.RegisterTransientClassesAsync(result);
-            }
-            catch (CodeFactoryException codeFactoryError)
-            {
-                MessageBox.Show(codeFactoryError.Message, "Automation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                var libraryLoader = VisualStudioActions.CreateLibraryLoaderClassAsync(result);
             }
             catch (Exception unhandledError)
             {

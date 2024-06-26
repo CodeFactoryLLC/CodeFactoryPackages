@@ -152,7 +152,7 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.XUnit
 
                     if (string.IsNullOrEmpty(testMethodName)) continue;
 
-                    if (!sourceMethods.Any(m => m.Name == testMethodName)) AddTests.Add(new Tuple<string, CsMethod>(testMethodName, contractMethod));
+                    if (!sourceMethods.Any(m => m.Name == testMethodName)) AddTests.Add(new Tuple<string, CsMethod> (testMethodName, contractMethod));
                 }
                 else
                 {

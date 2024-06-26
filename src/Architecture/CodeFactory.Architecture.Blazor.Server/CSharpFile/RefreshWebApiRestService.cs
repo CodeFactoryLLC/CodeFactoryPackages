@@ -19,7 +19,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
     /// </summary>
-    public class RefreshRestService : CSharpSourceCommandBase
+    public class RefreshWebApiRestService : CSharpSourceCommandBase
     {
         private static readonly string commandTitle = "Refresh Rest Service";
         private static readonly string commandDescription = "Refreshes the implementation of a rest service from a contract definition.";
@@ -27,7 +27,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 #pragma warning disable CS1998
 
         /// <inheritdoc />
-        public RefreshRestService(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public RefreshWebApiRestService(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -37,7 +37,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         /// <summary>
         /// The name of the command the configuration is tied to.
         /// </summary>
-        public static string Type = typeof(RefreshRestService).FullName;
+        public static string Type = typeof(RefreshWebApiRestService).FullName;
 
         /// <summary>
         /// The execution project that contains the definition of the logic contract to implement as a service.
@@ -122,7 +122,11 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         public override ConfigCommand LoadExternalConfigDefinition()
         {
             var command = new ConfigCommand
-            { Category = "JsonRestService", Name = nameof(RefreshRestService), CommandType = Type }
+            { Category = "JsonRestService", 
+                Name = nameof(RefreshWebApiRestService), 
+                CommandType = Type, 
+                Guidance = "Generates a Web API rest service from the methods defined in an c# interface."
+            }
                 .UpdateExecutionProject
                 (
                     new ConfigProject
@@ -263,6 +267,16 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                 );
 
             return command;
+        }
+
+        /// <summary>
+        /// Registers the default configuration with the configuration manager in CodeFactory.
+        /// </summary>
+        public static void RegisterDefaultConfiguration()
+        {
+            var command = new RefreshWebApiRestService(null, null);
+            var config = command.LoadExternalConfigDefinition();
+            config?.RegisterCommandWithDefaultConfiguration();
         }
         #endregion
 

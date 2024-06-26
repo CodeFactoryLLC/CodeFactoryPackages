@@ -48,6 +48,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Abstraction\DirectCSharpAbstractionBuilder.cs" />
     <Compile Include="AspNetCore\Blazor\BoundsCheckBlockNullBlazorControllerMessage.cs" />
     <Compile Include="AspNetCore\Blazor\BoundsCheckBlockStringBlazorControllerMessage.cs" />
     <Compile Include="AspNetCore\Blazor\CatchBlockExceptionBlazorControllerMessage.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Data\Sql\EF\RepositoryBuilder.cs" />
     <Compile Include="Data\Sql\EF\TryBlockRepositoryEF.cs" />
     <Compile Include="DependencyInjectionBuilder.cs" />
+    <Compile Include="DependencyInjection\DependencyInjectionBuilder.cs" />
     <Compile Include="General\FluentValidationBuilder.cs" />
     <Compile Include="General\LogicBuilder.cs" />
     <Compile Include="General\ModelBuilder.cs" />

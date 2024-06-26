@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CodeFactory.Automation.Standard.Logic;
+using System.Net;
 namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
 {
     /// <summary>
@@ -22,8 +23,8 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
         /// <param name="testName">The name of the test class to be refreshed.</param>
         /// <param name="contract">The target contract to implement testing for.</param>
         /// <param name="testProject">The target project the  target logic is implemented in.</param>
-        /// <returns></returns>
-        public static async Task RefreshMSTestIntegrationTestAsync(this IVsActions source,string testName, CsInterface contract, VsProject testProject)
+        /// <param name="testPrefixes">Prefixes to assign to each method being tested, this allows for the creation of multiple tests for a single method. Is an optional parameter</param>
+        public static async Task RefreshMSTestIntegrationTestAsync(this IVsActions source,string testName, CsInterface contract, VsProject testProject,List<string> testPrefixes = null)
         {
             if (source == null) throw new CodeFactoryException("Could not access the CodeFactory automation for visual studio cannot refresh the integration test.");
 
@@ -43,20 +44,21 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
 
             var testSource = await testProject.FindCSharpSourceByClassNameAsync(testClassName, false);
 
-            if (testSource == null) await source.CreateTestAsync(contract, testProject, testClassName);
+            if (testSource == null) await source.CreateTestClassAsync(contract, testProject, testClassName);
             else await source.UpdateTestAsync(contract, testSource.SourceCode);
 
         }
 
         /// <summary>
-        ///  Creates a new integration test;
+        ///  Creates a new integration test class.
         /// </summary>
         /// <param name="source">CodeFactory automation for Visual Studio.</param>
         /// <param name="contract">The target interface to be tested.</param>
         /// <param name="testProject">The target project the test should be created in.</param>
         /// <param name="testClassName">The name of the target test class.</param>
+        /// <param name="testPrefixes">Prefixes to assign to each method being tested, this allows for the creation of multiple tests for a single method. Is an optional parameter</param>
         /// <exception cref="CodeFactoryException">Raised if required data is missing.</exception>
-        public static async Task CreateTestAsync(this IVsActions source, CsInterface contract, VsProject testProject, string testClassName)
+        public static async Task CreateTestClassAsync(this IVsActions source, CsInterface contract, VsProject testProject, string testClassName,List<string> testPrefixes = null)
         {
             if (source == null) throw new CodeFactoryException("Could not access the CodeFactory automation for visual studio cannot refresh the tests.");
 
@@ -110,7 +112,7 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
 
             var testSourceCode = await doc.GetCSharpSourceModelAsync();
 
-            await source.UpdateTestAsync(contract, testSourceCode);
+            await source.UpdateTestAsync(contract, testSourceCode,testPrefixes);
         }
 
         /// <summary>
@@ -119,8 +121,9 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
         /// <param name="source">CodeFactory automation for visual studio.</param>
         /// <param name="contract">The target contract that is being tested.</param>
         /// <param name="testClassSource">The target source code that is to be updated.</param>
+        /// <param name="testPrefixes">Prefixes to assign to each method being tested, this allows for the creation of multiple tests for a single method. Is an optional parameter</param>
         /// <exception cref="CodeFactoryException">Throw if required data is missing.</exception>
-        public static async Task UpdateTestAsync(this IVsActions source, CsInterface contract, CsSource testClassSource)
+        public static async Task UpdateTestAsync(this IVsActions source, CsInterface contract, CsSource testClassSource,List<string> testPrefixes = null)
         {
             if (source == null) throw new CodeFactoryException("Could not access the CodeFactory automation for visual studio cannot refresh the integration tests.");
 
@@ -140,15 +143,28 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
 
             var sourceMethods = testClass.Methods ?? new List<CsMethod>();
 
-            var AddTests = new List<CsMethod>();
+            var AddTests = new List<Tuple<string, CsMethod>>();
 
             foreach (var contractMethod in contractMethods)
             {
-                var testMethodName = contractMethod.FormatTestMethodName();
+                if (testPrefixes == null)
+                {
+                    var testMethodName = contractMethod.FormatTestMethodName();
 
-                if (string.IsNullOrEmpty(testMethodName)) continue;
+                    if (string.IsNullOrEmpty(testMethodName)) continue;
 
-                if (!sourceMethods.Any(m => m.Name == testMethodName)) AddTests.Add(contractMethod);
+                    if (!sourceMethods.Any(m => m.Name == testMethodName)) AddTests.Add(new Tuple<string, CsMethod>(testMethodName, contractMethod));
+                }
+                else
+                {
+                    foreach (var prefix in testPrefixes)
+                    {
+                        var testMethodName = contractMethod.FormatTestMethodName(prefix);
+                        if (string.IsNullOrEmpty(testMethodName)) continue;
+
+                        if (!sourceMethods.Any(m => m.Name == testMethodName)) AddTests.Add(new Tuple<string, CsMethod>(testMethodName, contractMethod));
+                    }
+                }
             }
 
             if (!AddTests.Any()) return;
@@ -157,27 +173,27 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
 
             foreach (var addMethod in AddTests)
             {
-                bool hasReturnType = !addMethod.IsVoid;
+                bool hasReturnType = !addMethod.Item2.IsVoid;
                 bool isAsync = false;
-                bool hasParameters = addMethod.HasParameters;
+                bool hasParameters = addMethod.Item2.HasParameters;
                 StringBuilder parameterBuilder = new StringBuilder();
                 var testMethodFormatter = new SourceFormatter();
 
                 if (hasReturnType)
                 {
-                    isAsync = addMethod.ReturnType.IsTaskType();
+                    isAsync = addMethod.Item2.ReturnType.IsTaskType();
 
-                    if (isAsync) hasReturnType = !addMethod.ReturnType.IsTaskOnlyType();
+                    if (isAsync) hasReturnType = !addMethod.Item2.ReturnType.IsTaskOnlyType();
                 }
 
                 testMethodFormatter.AppendCodeLine(2);
                 testMethodFormatter.AppendCodeLine(2, "/// <summary>");
-                testMethodFormatter.AppendCodeLine(2, $"/// Integration test that tests the contract method \"{addMethod.Name}\"");
+                testMethodFormatter.AppendCodeLine(2, $"/// Integration test that tests the contract method \"{addMethod.Item2.Name}\"");
                 testMethodFormatter.AppendCodeLine(2, "/// </summary>");
                 testMethodFormatter.AppendCodeLine(2, "[TestMethod]");
 
-                if (isAsync) testMethodFormatter.AppendCodeLine(2, $"public async Task {addMethod.FormatTestMethodName()}()");
-                else testMethodFormatter.AppendCodeLine(2, $"public void {addMethod.FormatTestMethodName()}()");
+                if (isAsync) testMethodFormatter.AppendCodeLine(2, $"public async Task {addMethod.Item1}()");
+                else testMethodFormatter.AppendCodeLine(2, $"public void {addMethod.Item1}()");
                 testMethodFormatter.AppendCodeLine(2, "{");
                 testMethodFormatter.AppendCodeLine(3, "//Arrange");
                 testMethodFormatter.AppendCodeLine(3);
@@ -185,7 +201,7 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
                 {
                     bool firstParameter = true;
 
-                    foreach (var testParameter in addMethod.Parameters)
+                    foreach (var testParameter in addMethod.Item2.Parameters)
                     {
                         if (firstParameter)
                         {
@@ -208,7 +224,7 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
                 testMethodFormatter.AppendCodeLine(4, "//Act");
                 if (hasReturnType)
                 {
-                    var returnType = isAsync ? addMethod.ReturnType.GenericParameters.First().Type : addMethod.ReturnType;
+                    var returnType = isAsync ? addMethod.Item2.ReturnType.GenericParameters.First().Type : addMethod.Item2.ReturnType;
 
                     var defaultValue = returnType.GenerateCSharpDefaultValue();
 
@@ -224,8 +240,8 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
                 var methodParameters = hasParameters ? parameterBuilder.ToString() : "";
 
                 testMethodFormatter.AppendCodeLine(4, hasReturnType
-                        ? $"result ={awaitStatement}_contract.{addMethod.Name}({methodParameters});"
-                        : $"{awaitStatement}_contract.{addMethod.Name}({methodParameters});");
+                        ? $"result ={awaitStatement}_contract.{addMethod.Item2.Name}({methodParameters});"
+                        : $"{awaitStatement}_contract.{addMethod.Item2.Name}({methodParameters});");
                 testMethodFormatter.AppendCodeLine(4);
 
                 testMethodFormatter.AppendCodeLine(4, "//Assert");
@@ -259,8 +275,9 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
         /// Formats the name of the test method for the contract.
         /// </summary>
         /// <param name="source">Method model to generate the test method name from.</param>
+        /// <param name="prefix">Prefix to assign to the name of the test method.</param>
         /// <returns>Formatted method name or null if it is not found.</returns>
-        private static string FormatTestMethodName(this CsMethod source)
+        private static string FormatTestMethodName(this CsMethod source, string prefix = null)
         {
             if (source == null) return null;
 
@@ -268,7 +285,8 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.MSTest
 
             StringBuilder testMethodBuilder = new StringBuilder();
 
-            testMethodBuilder.Append($"{source.Name}By");
+            if (prefix == null) testMethodBuilder.Append($"{source.Name}By");
+            else testMethodBuilder.Append($"{prefix}{source.Name}By");
 
             foreach (var parameter in source.Parameters)
                 testMethodBuilder.Append(parameter.Name.GenerateCSharpProperCase());

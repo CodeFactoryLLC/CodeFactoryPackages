@@ -1,6 +1,4 @@
 ﻿using CodeFactory.Automation.NDF.Logic;
-using CodeFactory.Automation.NDF.Logic.Data.Sql;
-using CodeFactory.Automation.NDF.Logic.Data.Sql.EF;
 using CodeFactory.Automation.Standard.Logic;
 using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
@@ -21,15 +19,15 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
     /// </summary>
-    public class AddMissingRepositoryMembers : CSharpSourceCommandBase
+    public class AddMissingContractMembers : CSharpSourceCommandBase
     {
-        private static readonly string commandTitle = "Add Missing Repository Members";
-        private static readonly string commandDescription = "Adds missing contract interface members to the repository implementation.";
+        private static readonly string commandTitle = "Add Missing Contract Members";
+        private static readonly string commandDescription = "Adds missing contract interface members from the implementation.";
 
 #pragma warning disable CS1998
 
         /// <inheritdoc />
-        public AddMissingRepositoryMembers(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public AddMissingContractMembers(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -39,7 +37,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         /// <summary>
         /// The fully qualified name of the command to be used with configuration.
         /// </summary>
-        public static string Type = typeof(AddMissingRepositoryMembers).FullName;
+        public static string Type = typeof(AddMissingContractMembers).FullName;
 
 
         /// <summary>
@@ -53,20 +51,15 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         public static string ExecutionFolder = "ExecutionFolder";
 
         /// <summary>
-        /// Repositories name prefix
+        /// The project name starts with the following prefix.
         /// </summary>
-        public static string RepositoryPrefix = "RepositoryPrefix";
+        public static string ProjectNamePrefix = "ProjectNamePrefix";
         
 
         /// <summary>
-        /// Repositories name suffix.
+        /// The project name ends with the following suffix.
         /// </summary>
-        public static string RepositorySuffix = "RepositorySuffix";
-
-        /// <summary>
-        /// The name of the entity framework context to use with repository methods.
-        /// </summary>
-        public static string ContextName = "ContextName";
+        public static string ProjectNameSuffix = "ProjectNameSuffix";
 
         /// <summary>
         /// Loads the external configuration definition for this command.
@@ -74,13 +67,18 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         /// <returns>Will return the command configuration or null if this command does not support external configurations.</returns>
         public override ConfigCommand LoadExternalConfigDefinition()
         {
-            var config = new ConfigCommand{ CommandType = Type, Name = commandTitle, Category = "Repository",Guidance = "Command is used when updating missing members from a repository implementation." }
+            var config = new ConfigCommand
+            { CommandType = Type, 
+                Name = nameof(AddMissingContractMembers), 
+                Category = "Contract Implementation",
+                Guidance = "Command is used when updating missing members from a project implementation." 
+            }
             .UpdateExecutionProject
             (
                 new ConfigProject
                 { 
                     Name = ExecutionProject,
-                    Guidance = "The project where the repository class file resides in."
+                    Guidance = "The project where the project class file resides in."
                 }
                 .AddFolder
                 (
@@ -88,31 +86,23 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                     { 
                       Name = ExecutionFolder,
                       Required = false,
-                      Guidance = "The target folder the respoitory class will be found in."
-                    }
-                )
-                 .AddParameter
-                (
-                    new ConfigParameter
-                    { 
-                        Name = ContextName,
-                        Guidance = "The name of the entity framework context to use with repository methods."
+                      Guidance = "The target folder the project class will be found in."
                     }
                 )
                 .AddParameter
                 (
                     new ConfigParameter
                     { 
-                        Name = RepositoryPrefix,
-                        Guidance = "Optional, checks to makes sure the class starts with the provided prefix before considering it a repository."
+                        Name = ProjectNamePrefix,
+                        Guidance = "Optional, checks to makes sure the class starts with the provided prefix before adding missing contract members."
                     }
                 )
                 .AddParameter
                 (
                     new ConfigParameter
                     { 
-                        Name = RepositorySuffix,
-                        Guidance = "Optional, checks to makes sure the class starts with the provided suffix before considering it a repository."
+                        Name = ProjectNameSuffix,
+                        Guidance = "Optional, checks to makes sure the class starts with the provided suffix before adding missing contract members."
                     }
                 )
                
@@ -120,12 +110,22 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 
             return config;
         }
+
+        /// <summary>
+        /// Registers the default configuration with the configuration manager in CodeFactory.
+        /// </summary>
+        public static void RegisterDefaultConfiguration()
+        {
+            var command = new AddMissingContractMembers(null, null);
+            var config = command.LoadExternalConfigDefinition();
+            config?.RegisterCommandWithDefaultConfiguration();
+        }
         #endregion
 
         #region Overrides of VsCommandBase<IVsCSharpDocument>
 
         /// <summary>
-        /// Validation Repository that will determine if this command should be enabled for execution.
+        /// Validation project that will determine if this command should be enabled for execution.
         /// </summary>
         /// <param name="result">The target model data that will be used to determine if this command should be enabled.</param>
         /// <returns>Boolean flag that will tell code factory to enable this command or disable it.</returns>
@@ -136,9 +136,9 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 
             try
             {
-               var repoClass = result?.SourceCode?.Classes.FirstOrDefault();
+               var projectClass = result?.SourceCode?.Classes.FirstOrDefault();
 
-               isEnabled = repoClass != null;
+               isEnabled = projectClass != null;
 
                 ConfigCommand command = null;
 
@@ -152,12 +152,12 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 
                 if(isEnabled ) 
                 {
-                    var repoPrefix = command.ExecutionProject.ParameterValue(RepositoryPrefix);
-                    var repoSuffix = command.ExecutionProject.ParameterValue(RepositorySuffix);
-                    isEnabled = IsRepositoryClass(repoClass,repoPrefix,repoSuffix);
+                    var projectPrefix = command.ExecutionProject.ParameterValue(ProjectNamePrefix);
+                    var projectSuffix = command.ExecutionProject.ParameterValue(ProjectNameSuffix);
+                    isEnabled = IsProjectClass(projectClass,projectPrefix,projectSuffix);
                 }
 
-                if(isEnabled ) isEnabled = repoClass.GetMissingInterfaceMembers().Any();
+                if(isEnabled ) isEnabled = projectClass.GetMissingInterfaceMembers().Any();
             }
             catch (Exception unhandledError)
             {
@@ -177,45 +177,61 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         {
             try
             {
-                var repoClass = result.SourceCode?.Classes.FirstOrDefault();
+               
+                var projectSource = result.SourceCode;
 
-                if(repoClass == null) return;
+                if (projectSource == null) return;
 
-                var missingMembers = repoClass.GetMissingInterfaceMembers();
+                projectSource = await projectSource.AddUsingStatementAsync("Microsoft.Extensions.Logging");
+                projectSource = await projectSource.AddUsingStatementAsync("CodeFactory.NDF");
+
+                var projectClass = projectSource.Classes.FirstOrDefault();
+                if(projectClass == null) return;
+
+                var missingMembers = projectClass.GetMissingInterfaceMembers();
 
                 if( !missingMembers.Any() ) return;
 
 
+                string loggerFieldName = "_logger";
+
+                if (!projectClass.Fields.Any(f=>f.Name == loggerFieldName))
+                { 
+                    SourceFormatter formatter = new SourceFormatter();
+
+                    formatter.AppendCodeLine(2,"/// <summary>");
+                    formatter.AppendCodeLine(2,"/// Logger for the class");
+                    formatter.AppendCodeLine(2,"/// </summary>");
+                    formatter.AppendCodeLine(2,$"private readonly ILogger {loggerFieldName};");
+                    formatter.AppendCodeLine(2);
+                    projectSource = await projectClass.AddToBeginningAsync(formatter.ReturnSource());
+                    projectClass = projectSource.Classes.FirstOrDefault();
+                }
+
+       
                 var command = await ConfigManager.LoadCommandByFolderAsync(Type, ExecutionFolder, result)
                               ?? await ConfigManager.LoadCommandByProjectAsync(Type, result);
 
                 if(command == null)return;
 
-                var efContextName = command.ExecutionProject.ParameterValue(ContextName);
 
-                if (string.IsNullOrEmpty(efContextName))
-                    throw new CodeFactoryException("The entity framework context name could not be loaded from the configuration cannot add missing repository members.");
-                
-                var loggerBlock = new LoggerBlockNDFLogger("_logger");
+                var loggerBlock = new LoggerBlockNDFLogger(loggerFieldName);
 
                 var catchBlocks = new List<ICatchBlock>
                 { 
                     new CatchBlockManagedExceptionNDFException(loggerBlock),
-                    new CatchBlockDBUpdateExceptionNDFException(loggerBlock),
-                    new CatchBlockSqlExceptionNDFException(loggerBlock),
                     new CatchBlockExceptionNDFException(loggerBlock)
                 };
 
                 var boundChecks = new List<IBoundsCheckBlock>
                 { 
-                  
-                    new BoundsCheckBlockNullNDFException(true,loggerBlock),
-                    new BoundsCheckBlockStringNDFException(true,loggerBlock)
+                    new BoundsCheckBlockStringNDFException(true,loggerBlock),
+                    new BoundsCheckBlockNullNDFException(true,loggerBlock)
                 };
 
-                var tryBlock = new TryBlockRepositoryEF(efContextName,loggerBlock,catchBlocks);
+                var tryBlock = new TryBlockStandard(loggerBlock,catchBlocks);
 
-                var updatedRepoClass = await VisualStudioActions.AddClassMissingMembersAsync(result.SourceCode,repoClass,false,loggerBlock,Microsoft.Extensions.Logging.LogLevel.Information,boundChecks,tryBlock,missingMembers);
+                var updatedProjectClass = await VisualStudioActions.AddClassMissingMembersAsync(result.SourceCode,projectClass,false,loggerBlock,Microsoft.Extensions.Logging.LogLevel.Information,boundChecks,tryBlock,missingMembers);
                 
             }
             catch (CodeFactoryException cfException)
@@ -231,29 +247,27 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 
         }
 
-
         /// <summary>
-        /// Checks the name of the class to confirm it conforms to the repository class naming standard.
+        /// Validation check to make sure the project class is formatted to correct name.
         /// </summary>
-        /// <param name="repoClass">Class to be checked.</param>
-        /// <param name="repoPrefix">Expected prefix to be implemented, this can be null.</param>
-        /// <param name="repoSuffix">Expected suffix to be implemented, this can be null.</param>
-        /// <returns>True if valid class name, false if not.</returns>
-        private bool IsRepositoryClass(CsClass repoClass,string repoPrefix, string repoSuffix)
+        /// <param name="projectClass">Class to check.</param>
+        /// <param name="projectPrefix">The prefix the project class should start with, this can be null.</param>
+        /// <param name="projectSuffix">The suffix the project class should end with, this can be null.</param>
+        /// <returns>True class name is formatted correctly, false if not.</returns>
+        private bool IsProjectClass(CsClass projectClass,string projectPrefix, string projectSuffix)
         { 
             
-            bool isRepoClass = false;
+            bool isprojectClass = false;
 
-            if (repoClass != null) isRepoClass = true;
+            if (projectClass != null) isprojectClass = true;
 
-            if(isRepoClass & repoPrefix != null) isRepoClass = repoClass.Name.StartsWith(repoPrefix);
+            if(isprojectClass & projectPrefix != null) isprojectClass = projectClass.Name.StartsWith(projectPrefix);
 
-            if(isRepoClass & repoSuffix != null) isRepoClass = repoClass.Name.EndsWith(repoSuffix);
+            if(isprojectClass & projectSuffix != null) isprojectClass = projectClass.Name.EndsWith(projectSuffix);
             
-            return isRepoClass;
+            return isprojectClass;
         }
 
         #endregion
     }
-
 }

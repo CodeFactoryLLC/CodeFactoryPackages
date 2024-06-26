@@ -22,15 +22,15 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
    /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
     /// </summary>
-    public class AddMissingControllerMembers : CSharpSourceCommandBase
+    public class AddMissingComponentMembers : CSharpSourceCommandBase
     {
-        private static readonly string commandTitle = "Add Missing Controller Members";
-        private static readonly string commandDescription = "Adds missing contract interface members to the Controller implementation.";
+        private static readonly string commandTitle = "Add Missing Component Members";
+        private static readonly string commandDescription = "Adds missing contract interface members to the component implementation.";
 
 #pragma warning disable CS1998
 
         /// <inheritdoc />
-        public AddMissingControllerMembers(CodeFactory.WinVs.Logging.ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public AddMissingComponentMembers(CodeFactory.WinVs.Logging.ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -40,7 +40,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         /// <summary>
         /// The fully qualified name of the command to be used with configuration.
         /// </summary>
-        public static string Type = typeof(AddMissingControllerMembers).FullName;
+        public static string Type = typeof(AddMissingComponentMembers).FullName;
 
 
         /// <summary>
@@ -54,15 +54,15 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         public static string ExecutionFolder = "ExecutionFolder";
 
         /// <summary>
-        /// Repositories name prefix
+        /// Class name prefix
         /// </summary>
-        public static string ControllerPrefix = "ControllerPrefix";
+        public static string ClassNamePrefix = "ClassNamePrefix";
         
 
         /// <summary>
-        /// Repositories name suffix.
+        /// Class name suffix.
         /// </summary>
-        public static string ControllerSuffix = "ControllerSuffix";
+        public static string ClassNameSuffix = "ClassNameSuffix";
 
         /// <summary>
         /// Loads the external configuration definition for this command.
@@ -70,13 +70,19 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         /// <returns>Will return the command configuration or null if this command does not support external configurations.</returns>
         public override ConfigCommand LoadExternalConfigDefinition()
         {
-            var config = new ConfigCommand{ CommandType = Type, Name = commandTitle, Category = "Controller",Guidance = "Command is used when updating missing members from a controller implementation." }
+            var config = new ConfigCommand
+            { 
+                CommandType = Type, 
+                Name = nameof(AddMissingComponentMembers), 
+                Category = "Components",
+                Guidance = "Command is used when updating missing members from a component implementation." 
+            }
             .UpdateExecutionProject
             (
                 new ConfigProject
                 { 
                     Name = ExecutionProject,
-                    Guidance = "The project where the controller class file resides in."
+                    Guidance = "The project where the component class file resides in."
                 }
                 .AddFolder
                 (
@@ -84,23 +90,23 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                     { 
                       Name = ExecutionFolder,
                       Required = false,
-                      Guidance = "The target folder the controller class will be found in."
+                      Guidance = "The target folder the component class will be found in."
                     }
                 )
                 .AddParameter
                 (
                     new ConfigParameter
                     { 
-                        Name = ControllerPrefix,
-                        Guidance = "Optional, checks to makes sure the class starts with the provided prefix before considering it a controller."
+                        Name = ClassNamePrefix,
+                        Guidance = "Optional, checks to makes sure the class name starts with the provided prefix before considering the target component type."
                     }
                 )
                 .AddParameter
                 (
                     new ConfigParameter
                     { 
-                        Name = ControllerSuffix,
-                        Guidance = "Optional, checks to makes sure the class starts with the provided suffix before considering it a controller."
+                        Name = ClassNameSuffix,
+                        Guidance = "Optional, checks to makes sure the class ends with the provided suffix before considering it a target component type."
                     }
                 )
                
@@ -108,12 +114,22 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 
             return config;
         }
+
+        /// <summary>
+        /// Registers the default configuration with the configuration manager in CodeFactory.
+        /// </summary>
+        public static void RegisterDefaultConfiguration()
+        {
+            var command = new AddMissingComponentMembers(null, null);
+            var config = command.LoadExternalConfigDefinition();
+            config?.RegisterCommandWithDefaultConfiguration();
+        }
         #endregion
 
         #region Overrides of VsCommandBase<IVsCSharpDocument>
 
         /// <summary>
-        /// Validation controller that will determine if this command should be enabled for execution.
+        /// Validation component that will determine if this command should be enabled for execution.
         /// </summary>
         /// <param name="result">The target model data that will be used to determine if this command should be enabled.</param>
         /// <returns>Boolean flag that will tell code factory to enable this command or disable it.</returns>
@@ -124,9 +140,9 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 
             try
             {
-               var controllerClass = result?.SourceCode?.Classes.FirstOrDefault();
+               var componentClass = result?.SourceCode?.Classes.FirstOrDefault();
 
-               isEnabled = controllerClass != null;
+               isEnabled = componentClass != null;
 
                 ConfigCommand command = null;
 
@@ -140,12 +156,12 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 
                 if(isEnabled ) 
                 {
-                    var controllerPrefix = command.ExecutionProject.ParameterValue(ControllerPrefix);
-                    var controllerSuffix = command.ExecutionProject.ParameterValue(ControllerSuffix);
-                    isEnabled = IsControllerClass(controllerClass,controllerPrefix,controllerSuffix);
+                    var componentPrefix = command.ExecutionProject.ParameterValue(ClassNamePrefix);
+                    var componentSuffix = command.ExecutionProject.ParameterValue(ClassNameSuffix);
+                    isEnabled = IsComponentClass(componentClass,componentPrefix,componentSuffix);
                 }
 
-                if(isEnabled ) isEnabled = GetMissingContainerInterfaceMembersFromController(controllerClass).Any();
+                if(isEnabled ) isEnabled = GetMissingContainerInterfaceMembersFromComponent(componentClass).Any();
             }
             catch (Exception unhandledError)
             {
@@ -165,24 +181,22 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         {
             try
             {
-                var controllerSource = result?.SourceCode;
+                var componentSource = result?.SourceCode;
 
-                if ( controllerSource == null ) return;
+                if ( componentSource == null ) return;
 
-                var controllerClass = controllerSource.Classes.FirstOrDefault();
+                var componentClass = componentSource.Classes.FirstOrDefault();
 
-                if(controllerClass == null) return;
+                if(componentClass == null) return;
 
-                var missingMembers = GetMissingContainerInterfaceMembersFromController(controllerClass);
+                var missingMembers = GetMissingContainerInterfaceMembersFromComponent(componentClass);
 
                 if( !missingMembers.Any() ) return;
 
+                componentSource = await componentSource.AddUsingStatementAsync("Microsoft.Extensions.Logging");
+                componentSource = await componentSource.AddUsingStatementAsync("CodeFactory.NDF");
 
-
-                controllerSource = await controllerSource.AddUsingStatementAsync("Microsoft.Extensions.Logging");
-                controllerSource = await controllerSource.AddUsingStatementAsync("CodeFactory.NDF");
-
-                controllerClass = controllerSource.Classes.FirstOrDefault();
+                componentClass = componentSource.Classes.FirstOrDefault();
 
 
                 var command = await ConfigManager.LoadCommandByFolderAsync(Type, ExecutionFolder, result)
@@ -208,7 +222,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 
                 var tryBlock = new TryBlockStandard(loggerBlock,catchBlocks);
 
-                var updatedControllerClass = await VisualStudioActions.AddClassMissingMembersAsync(result.SourceCode,controllerClass,false,loggerBlock,Microsoft.Extensions.Logging.LogLevel.Information,boundChecks,tryBlock,missingMembers);
+                var updatedComponentClass = await VisualStudioActions.AddClassMissingMembersAsync(result.SourceCode,componentClass,false,loggerBlock,Microsoft.Extensions.Logging.LogLevel.Information,boundChecks,tryBlock,missingMembers);
                 
             }
             catch (CodeFactoryException cfException)
@@ -224,24 +238,24 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 
         }
 
-        private bool IsControllerClass(CsClass controllerClass,string controllerPrefix, string controllerSuffix)
+        private bool IsComponentClass(CsClass componentClass,string componentPrefix, string componentSuffix)
         { 
             
-            bool iscontrollerClass = false;
+            bool iscomponentClass = false;
 
-            if (controllerClass != null) iscontrollerClass = true;
+            if (componentClass != null) iscomponentClass = true;
 
-            if(iscontrollerClass & controllerPrefix != null) iscontrollerClass = controllerClass.Name.StartsWith(controllerPrefix);
+            if(iscomponentClass & componentPrefix != null) iscomponentClass = componentClass.Name.StartsWith(componentPrefix);
 
-            if(iscontrollerClass & controllerSuffix != null) iscontrollerClass = controllerClass.Name.EndsWith(controllerSuffix);
+            if(iscomponentClass & componentSuffix != null) iscomponentClass = componentClass.Name.EndsWith(componentSuffix);
             
-            return iscontrollerClass;
+            return iscomponentClass;
         }
 
         #endregion
 
 
-        private IReadOnlyList<CsMember> GetMissingContainerInterfaceMembersFromController(CsContainer source, List<MapNamespace> mappedNamespaces = null)
+        private IReadOnlyList<CsMember> GetMissingContainerInterfaceMembersFromComponent(CsContainer source, List<MapNamespace> mappedNamespaces = null)
         {
             if (source == null)
             {

@@ -76,7 +76,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
             {
                 CommandType = Type,
                 Category = "Testing",
-                Name = nameof(RefreshTest),
+                Name = nameof(RefreshXUnitIntegrationTest),
                 Guidance = "Automation command that generates integration tests from a provided interface."
             }
             .UpdateExecutionProject
@@ -115,6 +115,16 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
             );
 
             return config;
+        }
+
+        /// <summary>
+        /// Registers the default configuration with the configuration manager in CodeFactory.
+        /// </summary>
+        public static void RegisterDefaultConfiguration()
+        {
+            var command = new RefreshXUnitIntegrationTest(null, null);
+            var config = command.LoadExternalConfigDefinition();
+            config?.RegisterCommandWithDefaultConfiguration();
         }
         #endregion
 

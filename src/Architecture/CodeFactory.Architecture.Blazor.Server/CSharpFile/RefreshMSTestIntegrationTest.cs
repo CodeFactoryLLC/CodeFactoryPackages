@@ -19,7 +19,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
     /// </summary>
-    public class RefreshTest : CSharpSourceCommandBase
+    public class RefreshMSTestIntegrationTest : CSharpSourceCommandBase
     {
         private static readonly string commandTitle = "Refresh Test";
         private static readonly string commandDescription = "Refreshes an integration test from the target interface.";
@@ -27,7 +27,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 #pragma warning disable CS1998
 
         /// <inheritdoc />
-        public RefreshTest(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public RefreshMSTestIntegrationTest(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -37,7 +37,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         /// <summary>
         /// The fully qualified name of the command to be used with configuration.
         /// </summary>
-        public static string Type = typeof(RefreshTest).FullName;
+        public static string Type = typeof(RefreshMSTestIntegrationTest).FullName;
 
         /// <summary>
         /// Project executing the command
@@ -45,19 +45,19 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         public static string ExecutionProject = "ExecutionProject";
 
         /// <summary>
-        /// Project that hosts the intergration tests
+        /// Project that hosts the integration tests
         /// </summary>
         public static string TestProject = "TestProject";
 
         /// <summary>
         /// Prefix to append to the name of the integration test being created.
         /// </summary>
-        public static string TestPrefix = "TestPrefix";
+        public static string TestClassPrefix = "TestClassPrefix";
 
         /// <summary>
         /// Suffix to append to the name of the integration test being created.
         /// </summary>
-        public static string TestSuffix = "TestSuffix";
+        public static string TestClassSuffix = "TestClassSuffix";
 
 
         /// <summary>
@@ -69,8 +69,8 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
             var config = new ConfigCommand 
             { 
                 CommandType = Type, Category="Testing",
-                Name=nameof(RefreshTest),
-                Guidance="Automation command that generates integration tests from a provided interface." 
+                Name=nameof(RefreshMSTestIntegrationTest),
+                Guidance="Automation command that generates integration tests from a provided interface implemented using the MSTest framework." 
             }
             .UpdateExecutionProject
             (
@@ -85,16 +85,16 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
             (
                 new ConfigParameter
                 { 
-                    Name = TestPrefix,
-                    Guidance = "Optional, prefix to append to the name of the integration test when being created."
+                    Name = TestClassPrefix,
+                    Guidance = "Optional, prefix to append to the name of the integration test class when being created."
                 }
             )
             .AddParameter
             (
                 new ConfigParameter
                 { 
-                    Name = TestSuffix,
-                    Guidance = "Optional, Suffix to append to the name of the integration test when being created.",
+                    Name = TestClassSuffix,
+                    Guidance = "Optional, Suffix to append to the name of the integration test class when being created.",
                     Value = "Test"
 
                 }
@@ -102,6 +102,17 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 
             return config;
         }
+
+        /// <summary>
+        /// Registers the default configuration with the configuration manager in CodeFactory.
+        /// </summary>
+        public static void RegisterDefaultConfiguration()
+        {
+            var command = new RefreshMSTestIntegrationTest(null, null);
+            var config = command.LoadExternalConfigDefinition();
+            config?.RegisterCommandWithDefaultConfiguration();
+        }
+
         #endregion
 
         #region Overrides of VsCommandBase<IVsCSharpDocument>
@@ -165,8 +176,8 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                 var targetInterface = result.SourceCode?.Interfaces?.FirstOrDefault()
                     ?? throw new CodeFactoryException("Could not locate the interface to have tests created from.");
 
-                var testPrefix = config.ParameterValue(TestPrefix);
-                var testSuffix = config.ParameterValue(TestSuffix);
+                var testPrefix = config.ParameterValue(TestClassPrefix);
+                var testSuffix = config.ParameterValue(TestClassSuffix);
 
                 string noRemove = null;
 

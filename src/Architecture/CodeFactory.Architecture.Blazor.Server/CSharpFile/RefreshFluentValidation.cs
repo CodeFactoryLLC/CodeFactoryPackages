@@ -103,6 +103,16 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                         )
                 );
         }
+
+        /// <summary>
+        /// Registers the default configuration with the configuration manager in CodeFactory.
+        /// </summary>
+        public static void RegisterDefaultConfiguration()
+        {
+            var command = new RefreshFluentValidation(null, null);
+            var config = command.LoadExternalConfigDefinition();
+            config?.RegisterCommandWithDefaultConfiguration();
+        }
         #endregion
 
         #region Overrides of VsCommandBase<IVsCSharpDocument>

@@ -23,7 +23,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
     /// <summary>
     /// Code factory command for automation of a C# document when selected from a project in solution explorer.
     /// </summary>
-    public class RefreshEFRepository : CSharpSourceCommandBase
+    public class RefreshEntityFrameworkRepository : CSharpSourceCommandBase
     {
         private static readonly string commandTitle = "Refresh EF Repository";
         private static readonly string commandDescription = "Refreshes the EF repository and models implementation.";
@@ -32,7 +32,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 #pragma warning disable CS1998
 
         /// <inheritdoc />
-        public RefreshEFRepository(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
+        public RefreshEntityFrameworkRepository(ILogger logger, IVsActions vsActions) : base(logger, vsActions, commandTitle, commandDescription)
         {
             //Intentionally blank
         }
@@ -42,7 +42,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         /// <summary>
         /// The fully qualified name of the command to be used with configuration.
         /// </summary>
-        public static string Type = typeof(RefreshEFRepository).FullName;
+        public static string Type = typeof(RefreshEntityFrameworkRepository).FullName;
 
         /// <summary>
         /// The execution project that contains the definition of the entity framework entity models.
@@ -160,7 +160,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         /// <returns>Will return the command configuration or null if this command does not support external configurations.</returns>
         public override ConfigCommand LoadExternalConfigDefinition()
         {
-            var command = new ConfigCommand { Category = "RefreshEFRepository", Name = "EFRepositoryRefresh", CommandType = Type }
+            var command = new ConfigCommand { Category = "RefreshEFRepository", Name = nameof(RefreshEntityFrameworkRepository), CommandType = Type, Guidance = "Generates or updates a repository that supports a target EF table." }
                 .UpdateExecutionProject
                 (
                     new ConfigProject
@@ -360,6 +360,16 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                 );
 
             return command;
+        }
+
+        /// <summary>
+        /// Registers the default configuration with the configuration manager in CodeFactory.
+        /// </summary>
+        public static void RegisterDefaultConfiguration()
+        {
+            var command = new RefreshEntityFrameworkRepository(null, null);
+            var config = command.LoadExternalConfigDefinition();
+                config?.RegisterCommandWithDefaultConfiguration();
         }
         #endregion
 

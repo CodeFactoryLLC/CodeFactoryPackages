@@ -1,4 +1,5 @@
 ﻿using CodeFactory.Architecture.Blazor.Server.CSharpFile;
+using CodeFactory.Architecture.Blazor.Server.Project;
 using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
 using CodeFactory.WinVs.Commands.IDE;
@@ -38,35 +39,20 @@ namespace CodeFactory.Architecture.Blazor.Server.IDE
 
             try
             {
-                var refreshEFRepository = new RefreshEFRepository(null, null);
-                refreshEFRepository.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
-
-                var refreshRestService = new RefreshRestService(null, null);
-                refreshRestService.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
-
-                var refreshTest = new RefreshTest(null, null);
-                refreshTest.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
-
-                var refreshXUnitIntegrationTest = new RefreshXUnitIntegrationTest(null, null);
-                refreshXUnitIntegrationTest.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
-
-                var refreshFluentValidation = new RefreshFluentValidation(null, null);
-                refreshFluentValidation.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
-
-                var addMissingRepositoryMembers = new AddMissingRepositoryMembers(null, null);
-                addMissingRepositoryMembers.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
-
-                var updateLogicImplementation = new UpdateLogicImplementation(null, null);
-                updateLogicImplementation.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
-
-                var addMissingLogicMembers = new AddMissingLogicMembers(null, null);
-                addMissingLogicMembers.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
-
-                var addMissingControllerMembers = new AddMissingControllerMembers(null, null);
-                addMissingControllerMembers.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
-
-                var refreshLogic = new RefreshLogic(null, null);
-                refreshLogic.LoadExternalConfigDefinition().RegisterCommandWithDefaultConfiguration();
+                //Registering commands for configuration
+                RefreshEntityFrameworkRepository.RegisterDefaultConfiguration();
+                AddMissingSqlEfRepositoryMembers.RegisterDefaultConfiguration();
+                RefreshContractImplementation.RegisterDefaultConfiguration();
+                AddMissingContractMembers.RegisterDefaultConfiguration();
+                CloneContractMembers.RegisterDefaultConfiguration();
+                RefreshWebApiRestService.RegisterDefaultConfiguration();
+                RefreshDirectAbstraction.RegisterDefaultConfiguration();
+                RefreshFluentValidation.RegisterDefaultConfiguration();
+                RefreshMSTestIntegrationTest.RegisterDefaultConfiguration();
+                RefreshXUnitIntegrationTest.RegisterDefaultConfiguration();
+                AddMissingComponentMembers.RegisterDefaultConfiguration();
+                CreateLibraryLoader.RegisterDefaultConfiguration();
+                RegisterTransientServices.RegisterDefaultConfiguration();
 
                 ConfigManager.LoadConfiguration(result, "Automation", VisualStudioActions);
             }
