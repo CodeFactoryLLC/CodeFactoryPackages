@@ -23,10 +23,11 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
         /// <param name="efModel">Entity Framework model that will be transformed to and from.</param>
         /// <param name="entityProject">EF project the entity models are stored.</param>
         /// <param name="entityFolder">Optional, EF project folder where entities are stored, default is null.</param>
+        /// <param name="supportNullableTypes">Optional, that tells the transformation to support nullable types, default is false.</param>
         /// <returns>EF model with refreshed transform logic.</returns>
         /// <exception cref="CodeFactoryException">Raised if required data for transformation logic is not provided.</exception>
         public static async Task<CsClass> RefreshEntityFrameworkEntityTransform(this IVsActions source,
-            CsClass pocoModel, CsClass efModel, VsProject entityProject, VsProjectFolder entityFolder = null)
+            CsClass pocoModel, CsClass efModel, VsProject entityProject, VsProjectFolder entityFolder = null,bool supportNullableTypes = false)
         {
             if (source == null)
                 throw new CodeFactoryException("CodeFactory automation was not provided, cannot refresh the entity transform.");
@@ -57,11 +58,11 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
                 dataSource = projectChildren.Where(m => m.ModelType == VisualStudioModelType.CSharpSource).Cast<VsCSharpSource>().FirstOrDefault(c => c.Name == transformFileName)?.SourceCode;
             }
 
-            await source.LoadDefaultNullValueManager(entityProject);
+            if(!supportNullableTypes) await source.LoadDefaultNullValueManager(entityProject);
 
             if (dataSource == null) dataSource = await source.AddRefreshLogic(pocoModel, efModel, entityProject, entityFolder);
 
-            return await source.UpdateRefreshLogic(pocoModel, dataSource);
+            return await source.UpdateRefreshLogic(pocoModel, dataSource,supportNullableTypes);
 
         }
 
@@ -120,10 +121,11 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
         /// <param name="source">CodeFactory Automation.</param>
         /// <param name="pocoModel">POCO model that will be transformed to and from.</param>
         /// <param name="efModelSource">The source for the model to be updated.</param>
+        /// <param name="supportNullableTypes">Optional, that tells the transformation to support nullable types, default is false.</param>
         /// <returns></returns>
         /// <exception cref="CodeFactoryException"></exception>
         private static async Task<CsClass> UpdateRefreshLogic(this IVsActions source, CsClass pocoModel,
-            CsSource efModelSource)
+            CsSource efModelSource, bool supportNullableTypes = false)
         {
 
             if (pocoModel == null)
@@ -201,7 +203,7 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
                     createDataModelFormatter.AppendCodeLine(4,
                         property.PropertyType.TypeInNamespace(currentDataClass.Namespace)
                             ? $"{property.Name} = {property.PropertyType.Name}.CreateDataModel(pocoModel.{property.Name}){endingStatement}"
-                            : $"{property.Name} = pocoModel.{property.FormatSetEfModelFieldValue()}{endingStatement}");
+                            : $"{property.Name} = pocoModel.{property.FormatSetEfModelFieldValue(supportNullableTypes)}{endingStatement}");
                 }
 
                 propIndex++;
@@ -256,7 +258,7 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
                         createAppModelFormatter.AppendCodeLine(4,
                             property.PropertyType.TypeInNamespace(currentDataClass.Namespace)
                             ? $"{property.Name} = {property.Name}?.CreatePocoModel(){endingStatement}"
-                            : $"{property.Name} = {property.FormatSetPocoModelFieldValue()}{endingStatement}");
+                            : $"{property.Name} = {property.FormatSetPocoModelFieldValue(supportNullableTypes)}{endingStatement}");
 
                 }
 

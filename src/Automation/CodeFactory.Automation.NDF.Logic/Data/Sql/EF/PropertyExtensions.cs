@@ -12,18 +12,20 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
     /// </summary>
     public static class PropertyExtensions
     {
-
         /// <summary>
         /// Formats the set value syntax when updated a EF model.
         /// </summary>
         /// <param name="source">Property to validate from.</param>
+        /// <param name="supportsNullableTypes">Optional flag that determines if nullable types are supported. </param>
         /// <returns>Syntax to set the target property or field.</returns>
         /// <exception cref="CodeFactoryException">Raised when formatting errors occured.</exception>
-        public static string FormatSetEfModelFieldValue(this CsProperty source)
+        public static string FormatSetEfModelFieldValue(this CsProperty source, bool supportsNullableTypes = false)
         {
             string result = "";
 
-            if(source.PropertyType.Namespace == "System" &  (source.PropertyType.Name =="Nullable"))
+
+
+            if (source.PropertyType.Namespace == "System" &  (source.PropertyType.Name =="Nullable") & !supportsNullableTypes)
             {
                 CsType csType = source.PropertyType.GenericTypes.FirstOrDefault();
                 if (csType == null)
@@ -69,14 +71,14 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
                         break;
 
                     default:
-                        result = $"{source.Name}";  
+                        result = source.Name;  
                         break;
 
                 }
             }
             else
             { 
-                result = $"{source.Name}";  
+                result = source.Name;  
             }
 
             return result;
@@ -86,13 +88,15 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
         /// Formats the set value syntax when updated a POCO model.
         /// </summary>
         /// <param name="source">Property to validate from.</param>
+        /// <param name="supportsNullableTypes">Optional flag that determines if nullable types are supported. </param>
         /// <returns>Syntax to set the target property or field.</returns>
         /// <exception cref="CodeFactoryException">Raised when formatting errors occured.</exception>
-        public static string FormatSetPocoModelFieldValue(this CsProperty source)
+        public static string FormatSetPocoModelFieldValue(this CsProperty source, bool supportsNullableTypes = false)
         {
             string result = "";
 
-            if(source.PropertyType.Namespace == "System" &  (source.PropertyType.Name =="Nullable"))
+
+            if(source.PropertyType.Namespace == "System" &  (source.PropertyType.Name =="Nullable") & !supportsNullableTypes)
             {
                 CsType csType = source.PropertyType.GenericTypes.FirstOrDefault();
                 if (csType == null)
@@ -156,7 +160,7 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
                         break;
                     
                     case CsKnownLanguageType.String: 
-                        result = $"{source.Name}"; 
+                        result = source.Name; 
                         break;
 
                     default:
@@ -167,7 +171,7 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             }
             else
             { 
-                result = $"{source.Name}";  
+                result = source.Name;  
             }
 
             return result;

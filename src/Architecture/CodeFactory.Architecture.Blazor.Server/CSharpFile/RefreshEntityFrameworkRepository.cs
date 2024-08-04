@@ -154,6 +154,8 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         /// </summary>
         public static string AppModelValidatorSuffix = "AppModelValidatorSuffix";
 
+        public static string SupportNullableTypes = " SupportNullableTypes";
+
         /// <summary>
         /// Loads the external configuration definition for this command.
         /// </summary>
@@ -185,6 +187,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                             Name = EFContextClassName,
                             Guidance = "Enter the class name of the database context used by entity framework."
                         }
+
                     )
                     .AddParameter
                     (
@@ -201,6 +204,15 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                             Name = EFEntityRemoveSuffixes,
                             Guidance = "Comma separated value list of the suffixes in case sensitive format to be removed from the entity framework entity name when creating new objects."
                         }
+                    )
+                    .AddParameter
+                    (
+                        new ConfigParameter
+                        {
+                            Name = SupportNullableTypes,
+                            Guidance = "Boolean value True or False that determines if nullable types should be supported in the poco models that are created."
+                        }
+                        
                     )
                 )
                 .AddProject
@@ -423,6 +435,13 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                 var efEntityRemovePrefixes = command.ExecutionProject.ParameterValue(EFEntityRemovePrefixes);
                 var efEntityRemoveSuffixes = command.ExecutionProject.ParameterValue(EFEntityRemoveSuffixes);
 
+                var supportNullableTypesValue = command.ExecutionProject.ParameterValue(SupportNullableTypes);
+
+                var supportNullableTypes = false;
+                if (string.IsNullOrEmpty(supportNullableTypesValue)) supportNullableTypes = false;
+                else supportNullableTypes = supportNullableTypesValue.ToLowerInvariant() == "true";
+
+
                 VsProject appModelProject = await VisualStudioActions.GetProjectFromConfigAsync(command.Project(EntityProject))
                     ?? throw new CodeFactoryException("Could not load the entity model project, cannot refresh the EF repository.");
 
@@ -486,7 +505,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                 var nameManagement = NameManagement.Init(efEntityRemovePrefixes,efEntityRemoveSuffixes,appModelPrefix,appModelSuffix);
 
                 var appModel = (await VisualStudioActions.RefreshModelAsync(efModel, appModelProject,
-                                   EntityModelNamespaces(),nameManagement, appModelFolder, $"Application data model that supports '{efModel.Name}'", true,useSourceProperty: RepositoryBuilder.UseSourceProperty))
+                                   EntityModelNamespaces(),nameManagement, appModelFolder, $"Application data model that supports '{efModel.Name}'", !supportNullableTypes,useSourceProperty: RepositoryBuilder.UseSourceProperty))
                                ?? throw new CodeFactoryException($"Could not load the entity that supports the ef model '{efModel.Name}', cannot refresh the EF repository.");
 
                 string noReplacePrefix = null;
@@ -500,7 +519,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                 await VisualStudioActions.RefreshFluentValidationAsync(efModel,appModel,validation);
 
                 await VisualStudioActions.RefreshEntityFrameworkEntityTransform(appModel, efModel, efModelProject,
-                    efModelFolder);
+                    efModelFolder,supportNullableTypes);
 
                 var repositoryName = NameManagement.Init(efEntityRemovePrefixes,efEntityRemoveSuffixes,repoPrefix,repoSuffix).FormatName(efModel.Name);
 

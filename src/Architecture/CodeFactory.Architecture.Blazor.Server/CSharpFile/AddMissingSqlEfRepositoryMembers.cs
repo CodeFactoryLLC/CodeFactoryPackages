@@ -43,7 +43,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 
 
         /// <summary>
-        /// Exection project for the command.
+        /// Execution project for the command.
         /// </summary>
         public static string ExecutionProject = "ExecutionProject";
 
@@ -88,7 +88,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                     { 
                       Name = ExecutionFolder,
                       Required = false,
-                      Guidance = "The target folder the respoitory class will be found in."
+                      Guidance = "The target folder the repository class will be found in."
                     }
                 )
                  .AddParameter
