@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using CodeFactory.Automation.NDF.Logic.Testing.MSTest;
 using CodeFactory.Automation.NDF.Logic.General;
+using CodeFactory.Automation.NDF.Logic.Testing.XUnit;
 
 namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
 {
@@ -505,7 +506,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                 var nameManagement = NameManagement.Init(efEntityRemovePrefixes,efEntityRemoveSuffixes,appModelPrefix,appModelSuffix);
 
                 var appModel = (await VisualStudioActions.RefreshModelAsync(efModel, appModelProject,
-                                   EntityModelNamespaces(),nameManagement, appModelFolder, $"Application data model that supports '{efModel.Name}'", !supportNullableTypes,useSourceProperty: RepositoryBuilder.UseSourceProperty))
+                                   EntityModelNamespaces(),nameManagement, appModelFolder, $"Application data model that supports '{efModel.Name}'", !supportNullableTypes,useSourceProperty: RepositoryBuilder.UseSourceProperty ))
                                ?? throw new CodeFactoryException($"Could not load the entity that supports the ef model '{efModel.Name}', cannot refresh the EF repository.");
 
                 string noReplacePrefix = null;
@@ -537,7 +538,9 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                     if(contractInterface != null)
                     { 
                         var testName = NameManagement.Init(noReplacePrefix,noReplaceSuffix,testPrefix,testSuffix).FormatName(repositoryName);
-                        await VisualStudioActions.RefreshMSTestIntegrationTestAsync(testName, contractInterface,testProject); 
+                        //await VisualStudioActions.RefreshMSTestIntegrationTestAsync(testName, contractInterface,testProject); 
+                        await VisualStudioActions.RefreshXUnitIntegrationTestAsync(testName, contractInterface,
+                            testProject);
                     }
                 }
 
@@ -570,6 +573,28 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                 new ManualUsingStatementNamespace("System.Linq"),
                 new ManualUsingStatementNamespace("System.Text")
             };
+        }
+
+
+        /// <summary>
+        /// Checks the ef model property and determines if it should be included in a poco model implementation.
+        /// </summary>
+        /// <param name="source">Property to evaluate.</param>
+        /// <returns>True if the property should be included, false if not.</returns>
+        public bool UseSourceProperty(CsProperty source)
+        {
+            if (source == null) return false;
+
+            bool useSource = (source.HasGet & source.HasSet & source.Security == CsSecurity.Public & !source.IsStatic & !source.IsVirtual);
+
+            if (source.HasAttributes & useSource)
+            {
+                useSource = !source.Attributes.Any(a => a.Type.Namespace == "System.ComponentModel.DataAnnotations.Schema" & a.Type.Name == "ForeignKeyAttribute");
+                if (useSource) useSource = !source.Attributes.Any(a => a.Type.Namespace == "System.ComponentModel.DataAnnotations.Schema" & a.Type.Name == "InversePropertyAttribute");
+            }
+
+            return useSource;
+
         }
     }
 

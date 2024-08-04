@@ -78,7 +78,7 @@ namespace CodeFactory.Automation.NDF.Logic.General
 
             
             var modelClass =  await source.UpdateModelAsync(sourceClass, modelProject, modelSource, defaultNamespaces,nameManagement, modelFolder,
-                modelSummary, convertNullableTypes, mappedNamespaces);
+                modelSummary, convertNullableTypes, mappedNamespaces,useSourceProperty = useSourceProperty);
 
 
             //if(wasCreated) await source.RegisterTransientClassesAsync(modelProject,false);

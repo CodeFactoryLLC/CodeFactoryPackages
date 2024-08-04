@@ -421,38 +421,40 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.XUnit
 
             var projectRefs = await project.GetProjectReferencesAsync();
 
-            if (!projectRefs.Any(r => r.Name == "Microsoft.Extensions.Configuration"))
+            if (projectRefs.All(r => r.Name != "Microsoft.Extensions.Configuration"))
             {
 
                 if (throwError) throw new CodeFactoryException("The test project must reference 'Microsoft.Extensions.Configuration'");
                 return false;
             }
-            if (!projectRefs.Any(r => r.Name == "Microsoft.Extensions.Configuration.Json"))
+            if (projectRefs.All(r => r.Name != "Microsoft.Extensions.Configuration.Json"))
             {
                 if (throwError) throw new CodeFactoryException("The test project must reference 'Microsoft.Extensions.Configuration.Json'");
                 return false;
             }
-            if (!projectRefs.Any(r => r.Name == "Microsoft.Extensions.Configuration.EnvironmentVariables"))
+            if (projectRefs.All(r => r.Name != "Microsoft.Extensions.Configuration.EnvironmentVariables"))
             {
                 if (throwError) throw new CodeFactoryException("The test project must reference 'Microsoft.Extensions.Configuration.EnvironmentVariables'");
                 return false;
             }
-            if (!projectRefs.Any(r => r.Name == "Microsoft.Extensions.DependencyInjection"))
+            if (projectRefs.All(r => r.Name != "Microsoft.Extensions.DependencyInjection"))
             {
                 if (throwError) throw new CodeFactoryException("The test project must reference 'Microsoft.Extensions.DependencyInjection'");
                 return false;
             }
 
-            if (!projectRefs.Any(r => r.Name == "Microsoft.Extensions.Logging"))
+            if (projectRefs.All(r => r.Name != "Microsoft.Extensions.Logging"))
             {
                 if (throwError) throw new CodeFactoryException("The test project must reference 'Microsoft.Extensions.Logging'");
                 return false;
             }
-            if (!projectRefs.Any(r => r.Name == "Microsoft.VisualStudio.TestPlatform.TestFramework"))
-            {
-                if (throwError) throw new CodeFactoryException("The test project must reference 'MSTest.TestFramework'");
-                return false;
-            }
+
+            //SRG 8-4-2024 No longer checked for since multiple testing frames can be in use. 
+            //if (!projectRefs.Any(r => r.Name == "Microsoft.VisualStudio.TestPlatform.TestFramework"))
+            //{
+            //    if (throwError) throw new CodeFactoryException("The test project must reference 'Microsoft.VisualStudio.TestPlatform.TestFramework'");
+            //    return false;
+            //}
             return true;
         }
     }
