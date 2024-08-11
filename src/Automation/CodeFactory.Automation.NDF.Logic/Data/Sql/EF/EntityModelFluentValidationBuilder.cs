@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CodeFactory.Automation.Standard.Logic;
 
 namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
 {
@@ -87,7 +88,8 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
                     if(hasRequired) formatter.AppendCodeLine(3,requiredValidation);
                     if(hasStringLength) formatter.AppendCodeLine(3,stringLengthValidation);
                     formatter.AppendCodeLine(3);
-                  
+
+                    await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "Model Validation", $"Added one or more validation rules for the '{efProperty.Name}' property.");
                 }
             }
 

@@ -98,7 +98,7 @@ namespace CodeFactory.Automation.NDF.Logic
                         var manager = new SourceClassManager(loaderSource, loaderClass, source);
                         manager.LoadNamespaceManager();
 
-                        var loadRegistrationMethod = BuildInjectionMethod(transientClasses,CsSecurity.Protected,true, false, "LoadRegistration", "serviceCollection","configuration", manager.NamespaceManager);
+                        var loadRegistrationMethod = await BuildInjectionMethodAsync(transientClasses,CsSecurity.Protected,true, false, "LoadRegistration", "serviceCollection","configuration", manager.NamespaceManager);
 
                         if (string.IsNullOrEmpty(loadRegistrationMethod)) continue;
 
@@ -116,8 +116,15 @@ namespace CodeFactory.Automation.NDF.Logic
 
                             await manager.MemberReplaceAsync(currentRegistrationMethod,loadRegistrationMethod);
                         else await manager.MethodsAddAfterAsync(newRegistrationMethod);
+
+                        await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "Dependency Injection", $"Updated LoadRegistration method for '{loaderClass.Name}' in the project {targetProject.Name}. ");
+
                     }
+
+                    
                 }
+
+                
 
             }
             catch (CodeFactoryException)
@@ -290,7 +297,7 @@ namespace CodeFactory.Automation.NDF.Logic
         /// <param name="manager">The namespace manager that will be used to shorten type name registration with dependency injection. This will need to be loaded from the target class.</param>
         /// <param name="targetSecurity">Determines the target security keyword to add to the injection method.</param>
         /// <returns>The formatted method.</returns>
-        public static string BuildInjectionMethod(IEnumerable<CsClass> classes, CsSecurity targetSecurity,bool isOverride,  bool isStatic, string methodName, string serviceCollectionParameterName, string configurationParameterName, NamespaceManager manager = null)
+        public static async Task<string> BuildInjectionMethodAsync(IEnumerable<CsClass> classes, CsSecurity targetSecurity,bool isOverride,  bool isStatic, string methodName, string serviceCollectionParameterName, string configurationParameterName, NamespaceManager manager = null)
         {
 
             CodeFactory.SourceFormatter registrationFormatter = new CodeFactory.SourceFormatter();
@@ -308,13 +315,18 @@ namespace CodeFactory.Automation.NDF.Logic
             registrationFormatter.AppendCodeLine(0, methodSignature);
             registrationFormatter.AppendCodeLine(0, "{");
             registrationFormatter.AppendCodeLine(1, "//This method was auto generated, do not modify by hand!");
+
+            int methodCount = 0;
             foreach (var csClass in classes)
             {
                 var registration = FormatTransientRegistration(csClass, serviceCollectionParameterName, manager);
                 if (registration != null) registrationFormatter.AppendCodeLine(1, registration);
+                
+                methodCount++;
             }
             registrationFormatter.AppendCodeLine(0, "}");
 
+            if(methodCount > 0) await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "Dependency Injection", $"Registered '{methodCount}' transient services in the method '{methodName}' ");
             return registrationFormatter.ReturnSource();
         }
 

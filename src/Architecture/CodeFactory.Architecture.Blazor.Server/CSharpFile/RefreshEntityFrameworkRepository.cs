@@ -420,14 +420,22 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         /// <param name="result">The code factory model that has generated and provided to the command to process.</param>
         public override async Task ExecuteCommandAsync(VsCSharpSource result)
         {
-            try
-            {
+
+                await RefreshRepositoryAsync(result);
+
+        }
+
+        #endregion
+
+
+        public async Task RefreshRepositoryAsync(VsCSharpSource result)
+        {
                 var command = (await ConfigManager.LoadCommandByFolderAsync(Type, ExecutionModelFolder, result)
                               ?? await ConfigManager.LoadCommandByProjectAsync(Type, result))
                               ?? throw new CodeFactoryException("Could not load the automation configuration cannot refresh the EF repository.");
 
                 VsProject efModelProject = await VisualStudioActions.GetProjectFromConfigAsync(command.ExecutionProject)
-                    ?? throw new CodeFactoryException("Could load the EF hosting project, cannot refresh the EF repository.");
+                    ?? throw new CodeFactoryException("Could not load the EF hosting project, cannot refresh the EF repository.");
 
                 VsProjectFolder efModelFolder =
                     await VisualStudioActions.GetProjectFolderFromConfigAsync(command.ExecutionProject, ExecutionModelFolder);
@@ -503,62 +511,69 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
                 var efModel = result.SourceCode?.Classes?.FirstOrDefault()
                     ?? throw new CodeFactoryException("The EF entity class could not be loaded, cannot refresh the EF repository.");
 
-                var nameManagement = NameManagement.Init(efEntityRemovePrefixes,efEntityRemoveSuffixes,appModelPrefix,appModelSuffix);
+                var nameManagement = NameManagement.Init(efEntityRemovePrefixes, efEntityRemoveSuffixes, appModelPrefix, appModelSuffix);
+
+                await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Running, "Refresh Entity Framework Repository", $"Refreshing the repository for the entity framework model '{efModel.Name}'." );
+
+                await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Started, "Application Model", $"Starting management of the application model");
 
                 var appModel = (await VisualStudioActions.RefreshModelAsync(efModel, appModelProject,
-                                   EntityModelNamespaces(),nameManagement, appModelFolder, $"Application data model that supports '{efModel.Name}'", !supportNullableTypes,useSourceProperty: RepositoryBuilder.UseSourceProperty ))
+                                   EntityModelNamespaces(), nameManagement, appModelFolder, $"Application data model that supports '{efModel.Name}'", !supportNullableTypes, useSourceProperty: RepositoryBuilder.UseSourceProperty))
                                ?? throw new CodeFactoryException($"Could not load the entity that supports the ef model '{efModel.Name}', cannot refresh the EF repository.");
+
+                await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Finished, "Application Model", $"Finished management of the application model");
 
                 string noReplacePrefix = null;
                 string noReplaceSuffix = null;
 
-                var modelValidatorNameManagement = NameManagement.Init(noReplacePrefix,noReplaceSuffix,appModelValidatorPrefix,appModelValidatorSuffix);
                 
-                var validation = (await VisualStudioActions.RefreshValidationClassAsync(appModel,appModelProject, appModelValidatorFolder, modelValidatorNameManagement))
+                var modelValidatorNameManagement = NameManagement.Init(noReplacePrefix, noReplaceSuffix, appModelValidatorPrefix, appModelValidatorSuffix);
+
+                var validation = (await VisualStudioActions.RefreshValidationClassAsync(appModel, appModelProject, appModelValidatorFolder, modelValidatorNameManagement))
                                 ?? throw new CodeFactoryException($"Could not refresh the validation for the app model '{appModel.Name}', cannot refresh the EF repository.");
 
-                await VisualStudioActions.RefreshFluentValidationAsync(efModel,appModel,validation);
+                await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Started, "Application Model Validator", $"Starting management of the application model validation");
 
+                await VisualStudioActions.RefreshFluentValidationAsync(efModel, appModel, validation);
+
+                await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Finished, "Application Model Validator", $"Finished management of the application model validation");
+
+                await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Started, "Entity Model Transform", $"Starting management of ef model transform.");
                 await VisualStudioActions.RefreshEntityFrameworkEntityTransform(appModel, efModel, efModelProject,
-                    efModelFolder,supportNullableTypes);
+                    efModelFolder, supportNullableTypes);
+                await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Finished, "Entity Model Transform", $"Finish management of ef model transform.");
 
-                var repositoryName = NameManagement.Init(efEntityRemovePrefixes,efEntityRemoveSuffixes,repoPrefix,repoSuffix).FormatName(efModel.Name);
+                var repositoryName = NameManagement.Init(efEntityRemovePrefixes, efEntityRemoveSuffixes, repoPrefix, repoSuffix).FormatName(efModel.Name);
 
-                var repoClass = await VisualStudioActions.RefreshEFRepositoryAsync(repositoryName,efModel, repoProject, contractProject, appModel,
+                await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Started, "Repository", $"Starting management of repository - '{repositoryName}'.");
+                var repoClass = await VisualStudioActions.RefreshEFRepositoryAsync(repositoryName, efModel, repoProject, contractProject, appModel,
                     contextClass, supportsNDF, supportsLogging, repoFolder, contractFolder);
+                await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Finished, "Repository", $"Finished management of repository - '{repositoryName}'.");
 
-               
-                if(repoClass != null & testProject != null)
-                { 
+                if (repoClass != null & testProject != null)
+                {
                     var contractName = $"I{repositoryName}";
 
-                    CsInterface contractInterface = contractFolder != null ? (await contractFolder.FindCSharpSourceByInterfaceNameAsync(contractName))?.SourceCode?.Interfaces?.FirstOrDefault() 
+                    CsInterface contractInterface = contractFolder != null ? (await contractFolder.FindCSharpSourceByInterfaceNameAsync(contractName))?.SourceCode?.Interfaces?.FirstOrDefault()
                     : (await contractProject.FindCSharpSourceByInterfaceNameAsync(contractName))?.SourceCode?.Interfaces?.FirstOrDefault();
-                    
-                    if(contractInterface != null)
-                    { 
-                        var testName = NameManagement.Init(noReplacePrefix,noReplaceSuffix,testPrefix,testSuffix).FormatName(repositoryName);
+
+                    if (contractInterface != null)
+                    {
+                        var testName = NameManagement.Init(noReplacePrefix, noReplaceSuffix, testPrefix, testSuffix).FormatName(repositoryName);
                         //await VisualStudioActions.RefreshMSTestIntegrationTestAsync(testName, contractInterface,testProject); 
+
+                        await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Started, "Repository Integration Test", $"Starting management of xunit integration test for the test - '{testName}'.");
                         await VisualStudioActions.RefreshXUnitIntegrationTestAsync(testName, contractInterface,
                             testProject);
+                        await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Finished, "Repository Integration Test", $"Finished management of xunit integration test for the test - '{testName}'.");
                     }
                 }
 
-            }
-            catch (CodeFactoryException codeFactoryError)
-            {
-                MessageBox.Show(codeFactoryError.Message, "Automation Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            catch (Exception unhandledError)
-            {
-                _logger.Error($"The following unhandled error occurred while executing the solution explorer C# document command {commandTitle}. ",
-                    unhandledError);
 
-            }
 
+            
+            
         }
-
-        #endregion
 
         /// <summary>
         /// Helper method that creates the default namespaces to add to a new entity class that is created.

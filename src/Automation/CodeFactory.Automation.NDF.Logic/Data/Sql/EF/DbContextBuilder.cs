@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CodeFactory.Automation.Standard.Logic;
 
 namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
 {
@@ -138,10 +139,10 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             var doc = contextFolder != null ? await contextFolder.AddDocumentAsync($"{contextClass.Name}.Load.cs", loadFormatter.ReturnSource())
                 : await modelProject.AddDocumentAsync($"{contextClass.Name}.Load.cs", loadFormatter.ReturnSource());
 
-            return doc == null
-                ? throw new CodeFactoryException(
-                    $"Failed to create the load logic for the DbContext '{contextClass.Name}' cannot upgrade the repository.")
-                : await doc.GetCSharpSourceModelAsync();
+            if (doc == null) throw new CodeFactoryException($"Failed to create the load logic for the DbContext '{contextClass.Name}' cannot upgrade the repository.");
+
+            await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "EF Context Builder", $"Created EF context partial class '{doc.Name}'");
+            return  await doc.GetCSharpSourceModelAsync();
         }
 
         /// <summary>
@@ -185,9 +186,10 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             var doc = contextFolder != null ? await contextFolder.AddDocumentAsync("IDBContextConnection.cs", connectionFormatter.ReturnSource())
                 : await modelProject.AddDocumentAsync("IDBContextConnection.cs", connectionFormatter.ReturnSource());
 
-            return doc == null
-                ? throw new CodeFactoryException($"Failed to create the IDBContextConnection interface.")
-                : (await doc.GetCSharpSourceModelAsync())?.Interfaces.FirstOrDefault();
+            if (doc == null) throw new CodeFactoryException($"Failed to create the IDBContextConnection interface.");
+
+            await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "EF Entity Connection", "Created the IDBContextConnection interface.");
+            return (await doc.GetCSharpSourceModelAsync())?.Interfaces.FirstOrDefault();
         }
 
         /// <summary>
@@ -244,9 +246,11 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             var doc = contextFolder != null ? await contextFolder.AddDocumentAsync("DBContextConnection.cs", connectionFormatter.ReturnSource())
                 : await modelProject.AddDocumentAsync("DBContextConnection.cs", connectionFormatter.ReturnSource());
 
-            return doc == null
-                ? throw new CodeFactoryException($"Failed to create the DBContextConnection class.")
-                : (await doc.GetCSharpSourceModelAsync())?.Classes.FirstOrDefault();
+            if (doc == null) throw new CodeFactoryException($"Failed to create the DBContextConnection class.");
+
+            await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "EF Entity Connection", "Created the DBContextConnection class.");
+
+            return (await doc.GetCSharpSourceModelAsync())?.Classes.FirstOrDefault();
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CodeFactory.Automation.Standard.Logic;
 
 namespace CodeFactory.Automation.NDF.Logic.DependencyInjection
 {
@@ -89,6 +90,8 @@ namespace CodeFactory.Automation.NDF.Logic.DependencyInjection
             loaderFormatter.AppendCodeLine(0, "}");
 
             var doc = await project.AddDocumentAsync($"{className}.cs", loaderFormatter.ReturnSource());
+
+            await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "Dependency Injection", $"Created the '{className}' for the project {project.Name}. ");
 
             var loaderSourceCode = await doc.GetCSharpSourceModelAsync();
 

@@ -178,9 +178,10 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             var doc = contractFolder != null ? await contractFolder.AddDocumentAsync($"{contractName}.cs", contractFormatter.ReturnSource())
                 : await contractProject.AddDocumentAsync($"{contractName}.cs", contractFormatter.ReturnSource());
 
-            return doc == null
-                ? throw new CodeFactoryException($"Failed to create the repository contract '{contractName}' cannot upgrade the repository.")
-                : ((await doc.GetCSharpSourceModelAsync())?.Interfaces.FirstOrDefault());
+            if (doc == null) throw new CodeFactoryException($"Failed to create the repository contract '{contractName}' cannot upgrade the repository.");
+
+            await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "Repository", $"Created the repository contract '{contractName}'");
+            return ((await doc.GetCSharpSourceModelAsync())?.Interfaces.FirstOrDefault());
         }
 
         /// <summary>
@@ -299,9 +300,11 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             var doc = repoFolder != null ? await repoFolder.AddDocumentAsync($"{repoName}.cs", repoFormatter.ReturnSource())
                 : await repoProject.AddDocumentAsync($"{repoName}.cs", repoFormatter.ReturnSource());
 
-            return doc == null
-                ? throw new CodeFactoryException($"Failed to create the repository '{repoName}' cannot upgrade the repository.")
-                : await doc.GetCSharpSourceModelAsync();
+            if (doc == null) throw new CodeFactoryException($"Failed to create the repository '{repoName}' cannot upgrade the repository.");
+
+            await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "Repository", $"Created the repository class '{repoName}'");
+
+            return await doc.GetCSharpSourceModelAsync();
         }
 
         /// <summary>
@@ -436,6 +439,8 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
 
                 string syntax = injectFormatter.ReturnSource();
                 await methodBuilder.InjectMethodAsync(missingMethod, repoManager, 2, syntax: syntax,defaultLogLevel:logLevel);
+
+                await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "Repository", $"Created the repository method '{missingMethod.Name}'");
 
                 injectFormatter.ResetFormatter();
             }

@@ -162,6 +162,8 @@ namespace CodeFactory.Automation.NDF.Logic.General
                 ? await sourceFolder.AddDocumentAsync($"{className}.cs", validationFormatter.ReturnSource())
                 : await sourceProject.AddDocumentAsync($"{className}.cs", validationFormatter.ReturnSource());
 
+            if(validationDocument != null ) await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success,"Model Validation",$"Created the model validation class '{className}'");
+
             return validationDocument == null
                 ? throw new CodeFactoryException($"There was an internal error could not create the validation class that supports '{sourceClass.Name}'.")
                 : await validationDocument.GetCSharpSourceModelAsync();

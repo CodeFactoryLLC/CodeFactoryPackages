@@ -1,6 +1,7 @@
 ﻿using CodeFactory.Automation.NDF.Logic;
 using CodeFactory.Automation.NDF.Logic.Data.Sql;
 using CodeFactory.Automation.NDF.Logic.Data.Sql.EF;
+using CodeFactory.Automation.NDF.Logic.DependencyInjection;
 using CodeFactory.Automation.Standard.Logic;
 using CodeFactory.WinVs;
 using CodeFactory.WinVs.Commands;
@@ -148,6 +149,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
             {
                var repoClass = result?.SourceCode?.Classes.FirstOrDefault();
 
+                
                isEnabled = repoClass != null;
 
                 ConfigCommand command = null;
@@ -187,6 +189,7 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
         {
             try
             {
+                
                 var repoClass = result.SourceCode?.Classes.FirstOrDefault();
 
                 if(repoClass == null) return;
@@ -240,6 +243,8 @@ namespace CodeFactory.Architecture.Blazor.Server.CSharpFile
             }
 
         }
+
+        
 
 
         /// <summary>

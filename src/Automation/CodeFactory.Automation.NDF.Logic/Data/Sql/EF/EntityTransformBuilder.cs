@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CodeFactory.Automation.Standard.Logic;
+using System.Xml.Linq;
 
 namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
 {
@@ -108,6 +110,10 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
 
             if (document == null)
                 throw new CodeFactoryException($"Could not create the model transformation class file for '{efModel.Name}'");
+
+            await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "EF Entity Transform", $"Created partial class {document.Name}");
+
+
 
             var dataModelSource = await document.GetCSharpSourceModelAsync();
 
@@ -275,6 +281,8 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             if (createAppModelMethod != null) createAppModelMethod = dataModelManager.Container.GetModel<CsMethod>(createAppModelMethod.LookupPath);
             if (hasCreateAppModel) await dataModelManager.MemberReplaceAsync(createAppModelMethod, createAppModelFormatter.ReturnSource());
             else await dataModelManager.MethodsAddAfterAsync(createAppModelFormatter.ReturnSource());
+
+            await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "EF Entity Transform", $"Created transformation methods for the ef model '{dataModelManager.Container.Name}'");
 
             return dataModelManager.Container;
         }
@@ -620,6 +628,8 @@ namespace CodeFactory.Automation.NDF.Logic.Data.Sql.EF
             formatter.AppendCodeLine(0,"}");
 
             await efModelProject.AddDocumentAsync($"{managerName}.cs",formatter.ReturnSource());
+
+            await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "EF Entity Transform", $"Created the '{managerName}' for managing null values for ef models.");
 
         }
     }

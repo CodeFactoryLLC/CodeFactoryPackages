@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CodeFactory.Automation.Standard.Logic;
+using System.Windows.Controls;
 
 namespace CodeFactory.Automation.NDF.Logic.Testing.XUnit
 {
@@ -108,6 +109,9 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.XUnit
             testFormatter.AppendCodeLine(0, "}");
 
             var doc = await testProject.AddDocumentAsync($"{testClassName}.cs", testFormatter.ReturnSource());
+
+
+            await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "XUnit Testing", $"Created integration test class '{doc.Name}'");
 
             var testSourceCode = await doc.GetCSharpSourceModelAsync();
 
@@ -265,6 +269,8 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.XUnit
                 await sourceManager.ConstructorsAddAfterAsync(testMethodFormatter.ReturnSource());
 
                 testMethodFormatter.ResetFormatter();
+
+                await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "XUnit Testing", $"Created test method'{addMethod.Item1}'");
             }
 
             return;
@@ -406,6 +412,8 @@ namespace CodeFactory.Automation.NDF.Logic.Testing.XUnit
             sourceFormatter.AppendCodeLine(0, "}");
 
             await testProject.AddDocumentAsync("TestLoader.cs", sourceFormatter.ReturnSource());
+
+            await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "XUnit Testing", "Created TestLoader class.");
         }
 
         /// <summary>

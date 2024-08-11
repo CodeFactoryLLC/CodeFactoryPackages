@@ -163,6 +163,8 @@ namespace CodeFactory.Automation.NDF.Logic.General
 
                 if (modelDoc == null) throw new CodeFactoryException($"Error occurred saving the model to the project.");
 
+                await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "Model Management", $"Created the POCO model class '{targetClassName}'");
+
                 result = await modelDoc.GetCSharpSourceModelAsync();
             }
             catch (CodeFactoryException)
@@ -335,7 +337,12 @@ namespace CodeFactory.Automation.NDF.Logic.General
 
                 var propertySyntax = await propBuilder.BuildPropertyAsync(propertyToAdd, modelUpdateManager, 2);
 
-                if (propertySyntax != null) await modelUpdateManager.PropertiesAddAfterAsync(propertySyntax);
+                if (propertySyntax != null) 
+                { 
+                    await modelUpdateManager.PropertiesAddAfterAsync(propertySyntax);
+
+                    await CommandNotifications.SendCommandNotificationAsync(CommandNotificationStatus.Success, "Model Management", $"Added the property named '{propertyToAdd.Name}'");
+                }
 
             }
 
